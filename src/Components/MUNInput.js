@@ -28,5 +28,10 @@ export const MUNFixedInput = styled('input')`
 
     font-feature-settings: 'calt' off;
 
+    text-align: center;
+    @media (max-width: 768px) {
+        padding: 9px 3px;
+    }
+
     color: #FFFFFF;
 `

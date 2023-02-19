@@ -9,8 +9,6 @@ import Container from "../Container";
 const items = [
     {img: "/images/mint/Token.png", name: "Essence", poolSize: 242, bestOffer: 1.1, APY: 300, Duration: 21},
     {img: "/images/mint/Token.png", name: "BonkZ", poolSize: 1123, bestOffer: 8.6, APY: 270, Duration: 14},
-    {img: "/images/mint/Token.png", name: "BonkZABCDEF", poolSize: 1123456789, bestOffer: 8.6123456, APY: 27000000, Duration: 1400000},
-    {img: "/images/mint/Token.png", name: "BonkZABCDEFGHIJKLMN", poolSize: 1123456789123456789, bestOffer: 8.6123456, APY: 27000000, Duration: 1400000},
 ]
 
 function LendItem({item}) {

@@ -239,7 +239,7 @@ export const MintPriceText = styled('div')`
     font-feature-settings: 'calt' off;
 
     @media (max-width: 1535px) {
-        font-size: 10px;
+        font-size: 12px;
         line-height: 16px;
     }
 
@@ -285,7 +285,7 @@ export const CollectionTitleText = styled('div')`
         font-size: 10px;
         line-height: 10px;
 
-        font-weight: 300;
+        font-weight: 100;
     }
 
 
