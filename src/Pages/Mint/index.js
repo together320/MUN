@@ -25,7 +25,7 @@ export default function Mint() {
     }
   
     return <Container>
-        <Box className="mt-[30px] mx-[20px] lg:mt-[120px] lg:mx-[240px] 2xl:mx-[360px]">
+        <Box className="mt-[30px] mx-[20px] lg:mt-[120px] lg:mx-[120px] xl:mx-[240px] 2xl:mx-[360px]">
             <LandingHeaderText className="mb-[10px]">
                 Mint
             </LandingHeaderText>

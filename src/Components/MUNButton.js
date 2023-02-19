@@ -44,10 +44,33 @@ export const AmountButton = styled(ButtonText)`
     width: 30px;
     height: 30px;
     font-size: 20px;
+    text-align: center;
 
     @media (max-width: 1535px) {
         font-size: 14px;
         width: 25px;
         height: 25px;
+    }
+`;
+
+export const CollectionButton = styled(BorderButton)`
+    font-size: 16px;
+    width: 174px;
+    text-align: center;
+
+    @media (max-width: 1535px) {
+        font-size: 10px;
+        width: 116px;
+    }
+`;
+
+export const CollectionColorButton = styled(ColorButton)`
+    font-size: 16px;
+    width: 174px;
+    text-align: center;
+
+    @media (max-width: 1535px) {
+        font-size: 10px;
+        width: 118px;
     }
 `;

@@ -126,7 +126,7 @@ export const ShareJoinText = styled('div')`
 
     @media (max-width: 1535px) {
         font-size: 18px;
-        line-height: 27px;
+        line-height: 28px;
     }
 
     color: #5C6AE1;
@@ -181,20 +181,10 @@ export const ShareItemTitle = styled('div')`
     color: #5C6AE1;
 `;
 
-export const ShareItemHeader = styled('div')`
-    font-family: 'Poppins';
-    font-style: normal;
-    font-weight: 700;
-    font-size: 28px;
-    line-height: 42px;
-    /* identical to box height */
-
+export const ShareItemHeader = styled(ShareJoinText)`
     font-feature-settings: 'calt' off;
 
-    @media (max-width: 1535px) {
-        font-size: 18px;
-        line-height: 28px;
-    }
+    text-transform: none;
 
     color: #FFFFFF;
 `;
@@ -228,26 +218,14 @@ export const FooterCaption = styled('div')`
         line-height: 22px;
     }
 
+    cursor: pointer;
     letter-spacing: 0.05em;
 
     color: #FFFFFF;
 `;
 
-export const FooterTitle = styled('div')`
-    font-family: 'Poppins';
-    font-style: normal;
-    font-weight: 600;
-    font-size: 14px;
-    line-height: 100%;
-    /* identical to box height, or 14px */
-
-    @media (max-width: 1535px) {
-        font-size: 10px;
-    }
-
+export const FooterTitle = styled(ShareItemTitle)`
     text-transform: capitalize;
-
-    color: #5C6AE1;
 `;
 
 export const MintPriceText = styled('div')`
@@ -286,20 +264,41 @@ export const MintPriceValue = styled('div')`
     color: #FFFFFF;
 `;
 
-export const MintTotalValue = styled('div')`
+export const MintTotalValue = styled(ShareItemHeader)`
+    font-weight: 400;
+`;
+
+export const CollectionTitleText = styled('div')`
     font-family: 'Poppins';
     font-style: normal;
     font-weight: 400;
-    font-size: 28px;
-    line-height: 42px;
-    /* identical to box height */
+    font-size: 16px;
+    line-height: 14px;
+    /* identical to box height, or 88% */
 
     @media (max-width: 1535px) {
-        font-size: 18px;
-        line-height: 28px;
+        font-size: 10px;
+        line-height: 10px;
+    }
+    
+    @media (max-width: 768px) {
+        font-size: 10px;
+        line-height: 10px;
+
+        font-weight: 300;
     }
 
-    font-feature-settings: 'calt' off;
 
     color: #FFFFFF;
 `;
+
+export const CollectionItemText = styled(MintPriceText)`
+`;
+
+export const CollectionNameText = styled(MintPriceValue)`
+    font-weight: 700;
+`
+
+export const CollectionCashText = styled(MintPriceValue)`
+    color: #38D39C;
+`

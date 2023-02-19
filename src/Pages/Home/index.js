@@ -35,7 +35,7 @@ export default function Home() {
 
     const renderJoin = () => {
         return <>
-            <ShareJoinText className="cursor-pointer">
+            <ShareJoinText>
                 Join Us
             </ShareJoinText>
             <ShareHeaderText className="mb-[6px]">
