@@ -6,7 +6,7 @@ import Container from "../Container";
 
 export default function Lend() {
     return <Container>
-        <Box className="mt-[120px] mx-[240px] 2xl:mx-[360px]">
+        <Box className="mt-[30px] mx-[20px] lg:mt-[120px] lg:mx-[240px] 2xl:mx-[360px]">
             <LandingHeaderText className="mb-[10px]">
                 Lend SOL
             </LandingHeaderText>

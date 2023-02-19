@@ -56,6 +56,11 @@ export const LandingHeaderText = styled('div')`
         line-height: 80px;
     }
 
+    @media (max-width: 768px) {
+        font-size: 44px;
+        line-height: 55px;
+    }
+
     color: #FFFFFF;
 `
 
@@ -67,8 +72,8 @@ export const LandingCaptionText = styled('div')`
     line-height: 29px;
 
     @media (max-width: 1535px) {
-        font-size: 12px;
-        line-height: 20px;
+        font-size: 14px;
+        line-height: 22px;
     }
 
     color: #FFFFFF;
@@ -82,6 +87,10 @@ export const OperateHeaderText = styled('div')`
     line-height: 85px;
     /* identical to box height, or 304% */
 
+    @media (max-width: 768px) {
+        font-size: 14px;
+        line-height: 85px;
+    }
 
     color: #D9D9D9;
 `;
@@ -99,6 +108,8 @@ export const OperateCaptionText = styled('div')`
         line-height: 20px;
     }
 
+    text-align: center;
+
 
     color: #FFFFFF;
 `;
@@ -115,7 +126,7 @@ export const ShareJoinText = styled('div')`
 
     @media (max-width: 1535px) {
         font-size: 18px;
-        line-height: 28px;
+        line-height: 27px;
     }
 
     color: #5C6AE1;
@@ -130,8 +141,8 @@ export const ShareHeaderText = styled('div')`
     /* or 125% */
 
     @media (max-width: 1535px) {
-        font-size: 46px;
-        line-height: 56px;
+        font-size: 44px;
+        line-height: 55px;
     }
 
 

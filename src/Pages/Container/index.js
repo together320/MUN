@@ -10,7 +10,7 @@ export default function Container(props) {
         <Header />
         <Sidebar />
         {props.children}
-        <div className="mb-[128px]" />
+        <div className="mb-[22px] lg:mb-[240px]" />
         <Footer />
     </Box>;
 }

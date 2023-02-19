@@ -25,7 +25,7 @@ export default function Mint() {
     }
   
     return <Container>
-        <Box className="mt-[120px] mx-[240px] 2xl:mx-[360px]">
+        <Box className="mt-[30px] mx-[20px] lg:mt-[120px] lg:mx-[240px] 2xl:mx-[360px]">
             <LandingHeaderText className="mb-[10px]">
                 Mint
             </LandingHeaderText>
@@ -37,10 +37,10 @@ export default function Mint() {
                 <ShareItemHeader>
                     17,448 / 22,222 Minted
                 </ShareItemHeader>
-                <Box className="mt-[32px] mx-[180px] h-[40px] bg-[#191E46] rounded-[20px]">
+                <Box className="mt-[32px] mx-[26px] h-[18px] rounded-[10px] lg:mx-[180px] lg:h-[40px] lg:rounded-[20px] bg-[#191E46]">
                      <Box className="rounded-[20px] w-[60%] h-full" sx={{background: "linear-gradient(0deg, #A8B5E0, #A8B5E0), linear-gradient(0deg, #A8B5E0, #A8B5E0), #A8B5E0;"}} />
                 </Box>
-                <Box className="my-[40px] flex justify-center">
+                <Box className="mx-[72px] my-[40px] flex justify-center">
                     <img src="/images/mint/Token.png" alt="Token" />
                 </Box>
                 <Box className="mb-[32px] flex justify-center">
