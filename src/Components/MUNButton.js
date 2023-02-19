@@ -33,3 +33,15 @@ export function ShareButton(props) {
         <img src="/images/home/Vector.png" alt="Vector" />
     </ButtonText>
 }
+
+export const AmountButton = styled(ButtonText)`
+    background: #111430;
+    border-radius: 96px;
+    padding: 8px;
+    cursor: pointer;
+
+    color: #5C84FF;
+    width: 30px;
+    height: 30px;
+    font-size: 20px;
+`;

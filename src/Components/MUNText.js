@@ -176,3 +176,42 @@ export const FooterTitle = styled('div')`
 
     color: #5C6AE1;
 `;
+
+export const MintPriceText = styled('div')`
+    font-family: 'Poppins';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 24px;
+    /* identical to box height */
+
+    font-feature-settings: 'calt' off;
+
+    color: #FFFFFF;
+`;
+
+export const MintPriceValue = styled('div')`
+    font-family: 'Poppins';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 21px;
+    line-height: 32px;
+    /* identical to box height */
+
+    font-feature-settings: 'calt' off;
+
+    color: #FFFFFF;
+`;
+
+export const MintTotalValue = styled('div')`
+    font-family: 'Poppins';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 28px;
+    line-height: 42px;
+    /* identical to box height */
+
+    font-feature-settings: 'calt' off;
+
+    color: #FFFFFF;
+`;
