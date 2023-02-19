@@ -11,6 +11,11 @@ export const ButtonText = styled(Box)`
     line-height: 14px;
     /* identical to box height, or 78% */
 
+    @media (max-width: 1535px) {
+        font-size: 10px;
+        line-height: 10px;
+    }
+
     color: #FFFFFF;
 `
 
@@ -23,6 +28,11 @@ export const NavText = styled('div')`
     /* identical to box height, or 78% */
 
     color: #FFFFFF;
+
+    @media (max-width: 1535px) {
+        font-size: 12px;
+        line-height: 10px;
+    }
     
     display: flex;
     flex-direction: column;
@@ -41,6 +51,10 @@ export const LandingHeaderText = styled('div')`
     line-height: 120px;
     /* or 120% */
 
+    @media (max-width: 1535px) {
+        font-size: 67px;
+        line-height: 80px;
+    }
 
     color: #FFFFFF;
 `
@@ -51,6 +65,11 @@ export const LandingCaptionText = styled('div')`
     font-weight: 400;
     font-size: 18px;
     line-height: 29px;
+
+    @media (max-width: 1535px) {
+        font-size: 12px;
+        line-height: 20px;
+    }
 
     color: #FFFFFF;
 `
@@ -75,6 +94,11 @@ export const OperateCaptionText = styled('div')`
     line-height: 30px;
     /* identical to box height */
 
+    @media (max-width: 1535px) {
+        font-size: 14px;
+        line-height: 20px;
+    }
+
 
     color: #FFFFFF;
 `;
@@ -89,6 +113,11 @@ export const ShareJoinText = styled('div')`
 
     text-transform: uppercase;
 
+    @media (max-width: 1535px) {
+        font-size: 18px;
+        line-height: 28px;
+    }
+
     color: #5C6AE1;
 `;
 
@@ -100,6 +129,11 @@ export const ShareHeaderText = styled('div')`
     line-height: 85px;
     /* or 125% */
 
+    @media (max-width: 1535px) {
+        font-size: 46px;
+        line-height: 56px;
+    }
+
 
     color: #FFFFFF;
 `;
@@ -110,6 +144,11 @@ export const ShareCaptionText = styled('div')`
     font-weight: 400;
     font-size: 20px;
     line-height: 32px;
+
+    @media (max-width: 1535px) {
+        font-size: 14px;
+        line-height: 22px;
+    }
 
     color: #C2C2C2;
 `;
@@ -124,6 +163,10 @@ export const ShareItemTitle = styled('div')`
 
     text-transform: uppercase;
 
+    @media (max-width: 1535px) {
+        font-size: 10px;
+    }
+
     color: #5C6AE1;
 `;
 
@@ -137,6 +180,11 @@ export const ShareItemHeader = styled('div')`
 
     font-feature-settings: 'calt' off;
 
+    @media (max-width: 1535px) {
+        font-size: 18px;
+        line-height: 28px;
+    }
+
     color: #FFFFFF;
 `;
 
@@ -148,6 +196,11 @@ export const ShareItemCaption = styled('div')`
     line-height: 22px;
     font-feature-settings: 'calt' off;
 
+    @media (max-width: 1535px) {
+        font-size: 10px;
+        line-height: 14px;
+    }
+
     color: #C2C2C2;
 `;
 
@@ -158,6 +211,11 @@ export const FooterCaption = styled('div')`
     font-size: 14px;
     line-height: 32px;
     /* or 229% */
+
+    @media (max-width: 1535px) {
+        font-size: 10px;
+        line-height: 22px;
+    }
 
     letter-spacing: 0.05em;
 
@@ -171,6 +229,10 @@ export const FooterTitle = styled('div')`
     font-size: 14px;
     line-height: 100%;
     /* identical to box height, or 14px */
+
+    @media (max-width: 1535px) {
+        font-size: 10px;
+    }
 
     text-transform: capitalize;
 
@@ -187,6 +249,11 @@ export const MintPriceText = styled('div')`
 
     font-feature-settings: 'calt' off;
 
+    @media (max-width: 1535px) {
+        font-size: 10px;
+        line-height: 16px;
+    }
+
     color: #FFFFFF;
 `;
 
@@ -197,6 +264,11 @@ export const MintPriceValue = styled('div')`
     font-size: 21px;
     line-height: 32px;
     /* identical to box height */
+
+    @media (max-width: 1535px) {
+        font-size: 14px;
+        line-height: 22px;
+    }
 
     font-feature-settings: 'calt' off;
 
@@ -210,6 +282,11 @@ export const MintTotalValue = styled('div')`
     font-size: 28px;
     line-height: 42px;
     /* identical to box height */
+
+    @media (max-width: 1535px) {
+        font-size: 18px;
+        line-height: 28px;
+    }
 
     font-feature-settings: 'calt' off;
 

@@ -30,7 +30,7 @@ export function ShareButton(props) {
     {...props}>
         {props.children}
         <span className="mr-[13px]" />
-        <img src="/images/home/Vector.png" alt="Vector" />
+        <img className="h-[1em]" src="/images/home/Vector.png" alt="Vector" />
     </ButtonText>
 }
 
@@ -44,4 +44,10 @@ export const AmountButton = styled(ButtonText)`
     width: 30px;
     height: 30px;
     font-size: 20px;
+
+    @media (max-width: 1535px) {
+        font-size: 14px;
+        width: 25px;
+        height: 25px;
+    }
 `;

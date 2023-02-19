@@ -9,7 +9,7 @@ export default function Footer() {
             <Box className="grid grid-cols-2 mt-[106px] w-[50%]">
                 <Box className="pl-[50%]">
                     <FooterTitle>Navigate</FooterTitle>
-                    <Box className="mt-[35px] grid grid-cols-2">
+                    <Box className="mt-[24px] 2xl:mt-[36px] grid grid-cols-2">
                         <FooterCaption>Home</FooterCaption>
                         <FooterCaption>Lend</FooterCaption>
                         <FooterCaption>Profile</FooterCaption>
@@ -18,7 +18,7 @@ export default function Footer() {
                 </Box>
                 <Box className="pl-[50%]">
                     <FooterTitle>Social</FooterTitle>
-                    <Box className="mt-[35px]">
+                    <Box className="mt-[24px] 2xl:mt-[36px]">
                         <FooterCaption className="flex">
                             <img className="h-fit my-auto mr-[18px]" src="/icons/telegram-filled.png" alt="Telegram" />Telegram
                         </FooterCaption>

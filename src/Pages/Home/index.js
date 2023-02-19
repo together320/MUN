@@ -32,9 +32,8 @@ function SharedItem(props) {
 
 export default function Home() {
     return <Container>
-        <Box className="flex justify-center">
-            <img src="/images/home/MUN.png" alt="MUN" />
-            <span className="mr-[60px]" />
+        <Box className="grid grid-cols-2 gap-[60px]">
+            <img className="ml-auto" src="/images/home/MUN.png" alt="MUN" />
             <Box className="flex flex-col justify-center">
                 <LandingHeaderText className="pb-[27px]">
                     Building The <br/>
@@ -69,8 +68,8 @@ export default function Home() {
             </Box>
         </Box>
         <div className="mb-[215px]" />
-        <Box className="flex justify-center">
-            <Box className="flex flex-col justify-center">
+        <Box className="grid grid-cols-2 gap-[120px] 2xl:gap-[180px]">
+            <Box className="ml-auto flex flex-col justify-center">
                 <ShareJoinText className="cursor-pointer">
                     Join Us
                 </ShareJoinText>
@@ -87,7 +86,6 @@ export default function Home() {
                     Get it on MagicEden
                 </BorderButton>
             </Box>
-            <span className="mr-[182px]" />
             <img src="/images/home/FreeMint.png" alt="MUN" />
         </Box>
         <div className="mb-[176px]" />

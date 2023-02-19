@@ -5,7 +5,7 @@ import { NavTextActive, NavText, ColorButton, BorderButton } from "../../Compone
 
 function NavItem({active, title, url}) {
     const navigate = useNavigate();
-    const className = "ml-[60px] cursor-pointer";
+    const className = "ml-[40px] 2xl:ml-[60px] cursor-pointer";
     return active === true ?
         <NavTextActive className={className} onClick={() => navigate(url)}>{title}</NavTextActive>
     :
