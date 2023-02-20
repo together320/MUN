@@ -14,6 +14,10 @@ export default function Mint() {
         else
             setAmount(parseInt(amount));
     }, [amount])
+    
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, [])
 
     const handlePlus = () => {
         setAmount(parseInt(amount) + 1);

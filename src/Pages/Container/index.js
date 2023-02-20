@@ -10,7 +10,7 @@ export default function Container(props) {
     const name = isDesktop ? "vector.png" : "vector-mobile.png";
     return <Box className="bg-no-repeat bg-contain" style={{backgroundImage: `url(/images/${name})`}}>
         <Header />
-        <Sidebar />
+        {isDesktop && <Sidebar />}
         {props.children}
         <div className="mb-[22px] lg:mb-[240px]" />
         <Footer />

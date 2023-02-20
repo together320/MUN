@@ -1,4 +1,6 @@
 
+import { useEffect } from "react";
+
 import { Box, useMediaQuery } from "@mui/material";
 
 import { LandingCaptionText, LandingHeaderText, OperateHeaderText, OperateCaptionText, ShareJoinText, ShareHeaderText, ShareCaptionText, BorderButton, ShareItemTitle, ShareItemHeader, ShareItemCaption, ShareButton } from "../../Components";
@@ -32,6 +34,10 @@ function SharedItem(props) {
 
 export default function Home() {
     const isDesktop = useMediaQuery('(min-width:1024px)');
+
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, [])
 
     const renderJoin = () => {
         return <>

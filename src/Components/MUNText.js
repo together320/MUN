@@ -302,3 +302,21 @@ export const CollectionNameText = styled(MintPriceValue)`
 export const CollectionCashText = styled(MintPriceValue)`
     color: #38D39C;
 `
+
+export const CollectionDurationText = styled('div')`
+    font-family: 'Axiforma';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 13px;
+    line-height: 21px;
+    /* identical to box height */
+
+    font-feature-settings: 'calt' off;
+
+    @media (max-width: 1535px) {
+        font-size: 10px;
+        line-height: 14px;
+    }
+
+    color: #B4B4B4;
+`

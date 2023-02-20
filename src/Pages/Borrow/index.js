@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 
 import { Box, useMediaQuery } from "@mui/material";
 
-import { CollectionNameText, CollectionItemText, LandingCaptionText, LandingHeaderText, ShareItemHeader, CollectionButton, CollectionColorButton, CollectionCashText, MintPriceValue, MUNFixedInput, AmountButton, CollectionTitleText } from "../../Components";
+import { CollectionNameText, CollectionItemText, LandingCaptionText, LandingHeaderText, ShareItemHeader, CollectionButton, CollectionColorButton, CollectionCashText, MintPriceValue, CollectionTitleText } from "../../Components";
 import Container from "../Container";
 
 const items = [
@@ -14,24 +14,7 @@ const items = [
 function BorrowItem({item}) {
     const isDesktop = useMediaQuery('(min-width:1024px)');
     const [open, setOpen] = useState(false);
-    const [amount, setAmount] = useState(5);
     const classes = open ? "rounded-t-[12px]" : "rounded-[12px]";
-
-    useEffect(() => {
-        if (amount === "")
-            setAmount(0)
-        else
-            setAmount(parseInt(amount));
-    }, [amount])
-
-    const handlePlus = () => {
-        setAmount(parseInt(amount) + 1);
-    }
-
-    const handleMinus = () => {
-        const intAmount = parseInt(amount);
-        setAmount(intAmount > 0 ? intAmount - 1 : 0);
-    }
 
     if (isDesktop) {
         return <Box className="mb-[16px]">
@@ -162,6 +145,11 @@ function BorrowItem({item}) {
 }
 
 export default function Borrow() {
+
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, [])
+
     return <Container>
         <Box className="mt-[30px] mx-[20px] lg:mt-[120px] lg:mx-[120px] xl:mx-[240px] 2xl:mx-[360px]">
             <LandingHeaderText className="mb-[10px]">

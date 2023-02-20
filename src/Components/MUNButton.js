@@ -71,6 +71,6 @@ export const CollectionColorButton = styled(ColorButton)`
 
     @media (max-width: 1535px) {
         font-size: 10px;
-        width: 118px;
+        width: 116px;
     }
 `;
