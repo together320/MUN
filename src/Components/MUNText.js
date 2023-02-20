@@ -43,6 +43,18 @@ export const NavTextActive = styled(NavText)`
     font-weight: 700;
 `
 
+export const MobileNavText = styled('div')`
+    font-family: 'Axiforma';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 22px;
+    text-align: center;
+    padding: 19px 0;
+
+    color: #E0E0E0;
+`
+
 export const LandingHeaderText = styled('div')`
     font-family: 'Poppins';
     font-style: normal;
