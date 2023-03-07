@@ -4,6 +4,9 @@ import { Box, useMediaQuery } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { NavTextActive, NavText, ColorButton, BorderButton, MobileNavText } from "../../Components";
 
+import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
+import "./WalletMultiButton.css";
+
 function NavItem({active, title, url}) {
     const navigate = useNavigate();
     const className = "ml-[40px] 2xl:ml-[60px] cursor-pointer";
@@ -44,8 +47,8 @@ export default function Header() {
                 })
             }
             <span className="mr-auto" />
-            <ColorButton className="my-auto" onClick={() => navigate("/mint")}>Get Our NFT</ColorButton>
-            <BorderButton className="my-auto ml-[10px]">Connect Wallet</BorderButton>
+            <ColorButton className="my-auto mr-[10px] h-[48px] flex flex-col justify-center" onClick={() => navigate("/mint")}>Get Our NFT</ColorButton>
+            <WalletMultiButton />
         </Box>;
     }
     else {
@@ -62,7 +65,7 @@ export default function Header() {
                 })
             }
             <Box className="h-[60px] flex justify-center">
-                <BorderButton className="my-auto w-fit">Connect Wallet</BorderButton>
+                <WalletMultiButton />
             </Box>
             <Box className="h-[60px] flex justify-center">
                 <ColorButton className="mb-auto w-fit">Get Our NFT</ColorButton>
