@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Box, useMediaQuery } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { NavTextActive, NavText, ColorButton, BorderButton, MobileNavText } from "../../Components";
+import { NavTextActive, NavText, ColorButton, MobileNavText } from "../../Components";
 
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import "./WalletMultiButton.css";

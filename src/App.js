@@ -18,7 +18,7 @@ import {
     PhantomWalletAdapter,
     SlopeWalletAdapter,
     SolflareWalletAdapter,
-    SolletExtensionWalletAdapter,
+    //SolletExtensionWalletAdapter,
     SolletWalletAdapter,
     TorusWalletAdapter,
 } from '@solana/wallet-adapter-wallets';
