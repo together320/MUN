@@ -45,15 +45,15 @@ export default function Home() {
                 Join Us
             </ShareJoinText>
             <ShareHeaderText className="mb-[6px]">
-                Get your <br/>
-                MUN Shared
+                Get your own<br/>
+                MUN Cat
             </ShareHeaderText>
             <ShareCaptionText className="mb-[27px]">
                 Will be used as a powerful utility for it’s holders, providing <br/>
                 lending option and more tools in the upcoming future, <br/>
                 exclusively for our NFT holders
             </ShareCaptionText>
-            <BorderButton className="w-fit">
+            <BorderButton className="w-fit !px-[20px] !py-[13px]">
                 Get it on MagicEden
             </BorderButton>
         </>
@@ -124,7 +124,9 @@ export default function Home() {
             </Box>
             :
             <Box className="px-[26px]">
+                <Box className="flex justify-center">
                 <img className="mb-[26px]" src="/images/home/FreeMint.png" alt="MUN" />
+                </Box>
                 {renderJoin()}
             </Box>
         }

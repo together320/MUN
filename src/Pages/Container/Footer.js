@@ -11,7 +11,7 @@ export default function Footer() {
         return <>
             <FooterCaption onClick={() => navigate('/home')}>Home</FooterCaption>
             <FooterCaption onClick={() => navigate('/lend')}>Lend</FooterCaption>
-            <FooterCaption onClick={() => navigate('/my-profile')}>Profile</FooterCaption>
+            <FooterCaption onClick={() => navigate('/my-profile')}>Dashboard</FooterCaption>
             <FooterCaption onClick={() => navigate('/borrow')}>Borrow</FooterCaption>
         </>
     }
@@ -50,7 +50,7 @@ export default function Footer() {
                 </Box>
             </Box>
             <Box className="flex">
-                <FooterCaption className="ml-[38px]">© 2021 O9D, All rights reserved</FooterCaption>
+                <FooterCaption className="ml-[38px]">© 2023 MUN, All rights reserved</FooterCaption>
                 <FooterCaption className="ml-auto">Privacy Policy • Terms & Conditions</FooterCaption>
             </Box>
         </Box>;
@@ -67,7 +67,7 @@ export default function Footer() {
                 <Box className="mt-[24px]">
                     {renderSocial()}
                 </Box>
-                <FooterCaption className="mt-[32px]">© 2021 O9D, All rights reserved</FooterCaption>
+                <FooterCaption className="mt-[32px]">© 2023 MUN, All rights reserved</FooterCaption>
             </Box>
         </Box>
     }

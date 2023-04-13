@@ -10,10 +10,16 @@ export const ColorButton = styled(ButtonText)`
     cursor: pointer;
 `;
 
+export const InterestButton = styled(ButtonText)`
+    border-radius: 6px;
+    padding: 9px;
+    cursor: pointer;
+`;
+
 export const BorderButton = styled(ButtonText)`
     border: 1px solid #5C6AE1;
     border-radius: 40px;
-    padding: 13px 20px;
+    padding: 13px 10px;
     cursor: pointer;
 `;
 

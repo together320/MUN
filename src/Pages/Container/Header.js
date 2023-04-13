@@ -11,9 +11,15 @@ function NavItem({active, title, url}) {
     const navigate = useNavigate();
     const className = "ml-[40px] 2xl:ml-[60px] cursor-pointer";
     return active === true ?
-        <NavTextActive className={className} onClick={() => navigate(url)}>{title}</NavTextActive>
+        <Box className="flex flex-col justify-center items-center">
+            <NavTextActive className={className} onClick={() => navigate(url)}>{title}</NavTextActive>
+            <Box className="ml-[40px] 2xl:ml-[60px] mt-[7px] h-[7px] w-[7px] rounded-[7px] bg-[#5C84FF]"></Box>
+        </Box>
     :
-        <NavText className={className} onClick={() => navigate(url)}>{title}</NavText>
+        <Box className="flex flex-col justify-center">
+            <NavText className={className} onClick={() => navigate(url)}>{title}</NavText>
+            <Box className="ml-[40px] 2xl:ml-[60px] mt-[7px] h-[7px] w-[7px] rounded-[7px] bg-[#5C84FF]" style={{opacity : 0}}></Box>
+        </Box>
 }
 
 function MobileNavItem({active, title, url}) {
@@ -26,7 +32,7 @@ function MobileNavItem({active, title, url}) {
 
 const routes = [
     {title: "Home", url: "/home"},
-    {title: "My Profile", url: "/my-profile"},
+    {title: "Dashboard", url: "/my-profile"},
     {title: "Lend", url: "/lend"},
     {title: "Borrow", url: "/borrow"},
 ]
@@ -39,7 +45,7 @@ export default function Header() {
     const [open, setOpen] = useState(false);
 
     if (isDesktop) {
-        return <Box className="px-[60px] py-[24px] flex">
+        return <Box className="px-[60px] py-[24px] flex items-center">
             <img src="/logo.png" alt="Logo" />
             {
                 routes.map((item, i) => {
@@ -47,6 +53,7 @@ export default function Header() {
                 })
             }
             <span className="mr-auto" />
+            <img className="cursor-pointer my-auto mr-[10px]" src="/images/mint/muncat.png" alt="Mun cat" style={{width : '40px', height : '40px'}}/>
             <ColorButton className="my-auto mr-[10px] h-[48px] flex flex-col justify-center" onClick={() => navigate("/mint")}>Get Our NFT</ColorButton>
             <WalletMultiButton />
         </Box>;
@@ -68,7 +75,7 @@ export default function Header() {
                 <WalletMultiButton />
             </Box>
             <Box className="h-[60px] flex justify-center">
-                <ColorButton className="mb-auto w-fit">Get Our NFT</ColorButton>
+                <ColorButton className="items-center w-fit my-auto" onClick={() => navigate("/mint")}>Get Our NFT</ColorButton>
             </Box>
             </Box>}
         </>

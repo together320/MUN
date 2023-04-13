@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { Box } from "@mui/material";
 
-import { LandingCaptionText, LandingHeaderText, MintPriceText, MintPriceValue, MintTotalValue, ShareItemHeader, MUNInput, AmountButton, ColorButton } from "../../Components";
+import { LandingCaptionText, SolanaItem, LandingHeaderText, MintPriceText, MintPriceValue, MintTotalValue, ShareItemHeader, MUNInput, AmountButton, ColorButton } from "../../Components";
 import Container from "../Container";
 
 export default function Mint() {
@@ -30,13 +30,20 @@ export default function Mint() {
   
     return <Container>
         <Box className="mt-[30px] mx-[20px] lg:mt-[120px] lg:mx-[120px] xl:mx-[240px] 2xl:mx-[360px]">
-            <LandingHeaderText className="mb-[10px]">
-                Mint
-            </LandingHeaderText>
-            <LandingCaptionText>
-                Join MUN by getting our NFT! <br/>
-                Please make sure you are visiting munfinance.io.
-            </LandingCaptionText>
+            <Box className="flex flex-row">
+                <Box className="pt-[13px] sm:pt-[15px] 2xl:pt-[30px] " style={{width : '7px', height : 'auto', marginRight : '20px'}}>
+                    <Box className="w-[7px] bg-[#5C84FF] rounded-[8px] h-[60px] lg:h-[100px]"/>
+                </Box>
+                <Box className="flex flex-col">
+                    <LandingHeaderText className="mb-[10px]">
+                        Mint
+                    </LandingHeaderText>
+                    <LandingCaptionText className="mb-[40px] sm:mb-[100px]" style={{color : '#9395AA'}}>
+                        Join MUN by getting our NFT! <br/>
+                        Please make sure you are visiting mun.tools
+                    </LandingCaptionText>
+                </Box>
+            </Box>
             <Box className="mt-[72px] bg-[#0B0E27] rounded-[12px] py-[50px] text-center">
                 <ShareItemHeader>
                     17,448 / 22,222 Minted
@@ -49,8 +56,7 @@ export default function Mint() {
                 </Box>
                 <Box className="mb-[32px] flex justify-center">
                     <MintPriceText className="my-auto mr-[14px]">Mint Price</MintPriceText>
-                    <img className="my-auto h-fit" src="/images/cash.png" alt="Cash" />
-                    <MintPriceValue className="ml-[8px]">1</MintPriceValue>
+                    <SolanaItem value={1}/>
                 </Box>
                 <Box className="mb-[32px] flex justify-center">
                     <MintPriceText className="my-auto mr-[32px]">Choose Amount</MintPriceText>

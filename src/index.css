@@ -5,3 +5,18 @@
 * {
     font-family: 'Poppins', sans-serif !important;
 }
+
+.noscroll::-webkit-scrollbar {
+    display: none;   
+}
+
+.h-scroll::-webkit-scrollbar {
+    height: 8px;              /* height of horizontal scrollbar ← You're missing this */
+    width: 4px;               /* width of vertical scrollbar */
+    border-radius: 4px;
+}
+
+.h-scroll::-webkit-scrollbar-thumb{
+    margin-top : 7px;
+    border-radius: 10px;
+}
