@@ -1,20 +1,4 @@
-import $ from "jquery";
-
-export const GetCollectionList = () => {
-	return new Promise((resolve, reject) => {
-		$.ajax({
-			type: "GET",
-			url : `http://api-mainnet.magiceden.dev/v2/collections`,
-			data : {
-				'offset' : 0,
-                'limit' : 500
-			},
-			success: function(result) {
-				resolve(JSON.parse(result));
-			},
-			error: function(err) {
-				reject(JSON.parse(err));
-			}
-		});
-	});
+export const GetCollectionList = async () => {
+	//https://stats-mainnet.magiceden.io/collection_stats/popular_collections/sol?limit=1000&window=1d
+	return await fetch("https://api-mainnet.magiceden.dev/v2/collections?offset=0&limit=500", {method: "GET"}).then(res => res.json());
 }

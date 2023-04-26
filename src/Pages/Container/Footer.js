@@ -50,14 +50,14 @@ export default function Footer() {
                 </Box>
             </Box>
             <Box className="flex">
-                <FooterCaption className="ml-[38px]">© 2023 MUN, All rights reserved</FooterCaption>
-                <FooterCaption className="ml-auto">Privacy Policy • Terms & Conditions</FooterCaption>
+                <FooterCaption className="ml-[38px] !cursor-default">© 2023 MUN, All rights reserved</FooterCaption>
+                <FooterCaption className="ml-auto !cursor-default">Privacy Policy • Terms & Conditions</FooterCaption>
             </Box>
         </Box>;
     }
     else {
         return <Box className="pb-[32px]">
-            <img className="w-[160px]" src="/logo.svg" alt="Logo" />
+            <img className="w-[160px] px-[32px]" src="/logo.svg" alt="Logo" />
             <Box className="px-[32px]">
                 <FooterTitle>Navigate</FooterTitle>
                 <Box className="mt-[24px] grid grid-cols-2">

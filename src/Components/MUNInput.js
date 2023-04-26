@@ -15,21 +15,21 @@ export const AmountInput = styled('input')`
     background: #1B1E3D;
     border-radius: 6px;
 
-    padding: 9px 0px;
+    padding: 3px 9px;
     outline : 0;
 
     font-family: 'Poppins';
     font-style: normal;
     font-weight: 400;
-    font-size: 21px;
+    font-size: 18px;
     line-height: 32px;
     /* identical to box height */
 
     font-feature-settings: 'calt' off;
-    @media (max-width: 768px) {
-        font-size : 16px;
+    @media (max-width: 1024px) {
+        font-size : 15px;
         line-height : 24px;
-        padding: 9px 15px;
+        padding: 3px 9px;
     }
 
     color: #FFFFFF;

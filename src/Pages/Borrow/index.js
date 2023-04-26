@@ -13,6 +13,7 @@ import Container from "../Container";
 
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
+import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 
 const options = ['Highest Offer', 'Longest duration', 'Shortest duration', 'Lowest interest'];
 
@@ -50,8 +51,8 @@ function BorrowItem({item}) {
 
     if (isDesktop) {
         return <Box className="mb-[16px]">
-            <Box className={`px-[26px] py-[18px] bg-[#111430] ${classes} grid gap-[5px] 2xl:gap-[10px]`} gridTemplateColumns={'106px 106px 30fr 20fr 40fr 40fr 20fr'} style={{minWidth : 'fit-content'}}>
-                <Box className="w-[106px] h-[106px] bg-cover" style={{backgroundImage: `url(${item.img})`}} />
+            <Box className={`px-[26px] py-[18px] bg-[#111430] ${classes} grid gap-[5px] 2xl:gap-[10px]`} gridTemplateColumns={'80px 96px 30fr 20fr 40fr 40fr 20fr'} style={{minWidth : 'fit-content'}}>
+                <Box className="w-[80px] h-[80px] bg-cover" style={{backgroundImage: `url(${item.img})`}} />
                 <CollectionNameText className="my-auto break-all text-center">{item.name}</CollectionNameText>
                 <SolanaItem value={item.floorPrice} style={{minWidth : '80px'}}/>
                 <SolanaItem value={item.bestOffer} style={{minWidth : '70px'}}/>
@@ -90,13 +91,13 @@ function BorrowItem({item}) {
                         </Box>
                     </Box>
                 </Box>
-                <Box className="grid grid-cols-3">
-                    <Box className="cursor-pointer w-auto h-[106px] bg-cover rounded-[6px] m-[5px] bg-center" style={{backgroundImage: `url(${item.img})`, border: "1px solid #5C84FF"}} />
-                    <Box className="cursor-pointer w-auto h-[106px] bg-cover rounded-[6px] m-[5px] bg-center" style={{backgroundImage: `url(${item.img})`, border: "1px solid #111430"}} />
-                    <Box className="cursor-pointer w-auto h-[106px] bg-cover rounded-[6px] m-[5px] bg-center" style={{backgroundImage: `url(${item.img})`, border: "1px solid #111430"}} />
-                    <Box className="cursor-pointer w-auto h-[106px] bg-cover rounded-[6px] m-[5px] bg-center" style={{backgroundImage: `url(${item.img})`, border: "1px solid #111430"}} />
-                    <Box className="cursor-pointer w-auto h-[106px] bg-cover rounded-[6px] m-[5px] bg-center" style={{backgroundImage: `url(${item.img})`, border: "1px solid #111430"}} />
-                    <Box className="cursor-pointer w-auto h-[106px] bg-cover rounded-[6px] m-[5px] bg-center" style={{backgroundImage: `url(${item.img})`, border: "1px solid #111430"}} />
+                <Box className="grid grid-cols-3 2xl:grid-cols-5">
+                    <Box className="cursor-pointer w-auto h-auto bg-cover rounded-[6px] m-[5px] bg-center" style={{backgroundImage: `url(${item.img})`, aspectRatio : 1}} />
+                    <Box className="cursor-pointer w-auto h-auto bg-cover rounded-[6px] m-[5px] bg-center" style={{backgroundImage: `url(${item.img})`, aspectRatio : 1}} />
+                    <Box className="cursor-pointer w-auto h-auto bg-cover rounded-[6px] m-[5px] bg-center" style={{backgroundImage: `url(${item.img})`, aspectRatio : 1}} />
+                    <Box className="cursor-pointer w-auto h-auto bg-cover rounded-[6px] m-[5px] bg-center" style={{backgroundImage: `url(${item.img})`, aspectRatio : 1}} />
+                    <Box className="cursor-pointer w-auto h-auto bg-cover rounded-[6px] m-[5px] bg-center" style={{backgroundImage: `url(${item.img})`, aspectRatio : 1}} />
+                    <Box className="cursor-pointer w-auto h-auto bg-cover rounded-[6px] m-[5px] bg-center" style={{backgroundImage: `url(${item.img})`, aspectRatio : 1}} />
                 </Box>
                 <Box className="flex flex-col">
                     <Box className="grid px-[13px] py-[13px] bg-[#111430] rounded-[12px] gap-[10px] sm:gap-[25px]" gridTemplateColumns={'1fr 2fr 2fr 1fr'}>
@@ -123,7 +124,7 @@ function BorrowItem({item}) {
                 </Box>
                 <Box/>
                 <Box className="ml-auto mt-auto">
-                    <CollectionColorButton>BORROW</CollectionColorButton>
+                    <CollectionColorButton className="!font-GoodTime !w-fit">BORROW</CollectionColorButton>
                 </Box>
             </Box>
             )}
@@ -138,20 +139,20 @@ function BorrowItem({item}) {
                     <CollectionButton className="ml-auto my-auto" onClick={() => setOpen(!open)}>Borrow</CollectionButton>
                 </Box>
                 <Box className="grid grid-cols-2">
-                    <Box className="grid grid-cols-1 gap-[10px]">
-                        <CollectionNameText className="text-center">Floor Price</CollectionNameText>
+                    <Box className="grid grid-cols-1 gap-[15px]">
+                        <CollectionTitleText className="text-center !text-[#9395AA]">Floor Price</CollectionTitleText>
                         <SolanaItem value={item.floorPrice}/>
-                        <CollectionNameText className="text-center">Interest</CollectionNameText>
+                        <CollectionTitleText className="text-center !text-[#9395AA]">Interest</CollectionTitleText>
                         <Box className="flex justify-center items-center">
                             <InterestButton className="bg-[#1B1E3D] w-[32px] h-[32px] flex items-center justify-center mr-[5px] !text-[#666880]">L</InterestButton>
                             <InterestButton className="bg-[#FFBE5C] w-[32px] h-[32px] flex items-center justify-center mr-[5px]">M</InterestButton>
                             <InterestButton className="bg-[#EB5757] w-[32px] h-[32px] flex items-center justify-center mr-[5px]">H</InterestButton>
                         </Box>
                     </Box>
-                    <Box className="grid grid-cols-1 gap-[10px]">
-                        <CollectionNameText className="text-center">Best Offer</CollectionNameText>
+                    <Box className="grid grid-cols-1 gap-[15px]">
+                        <CollectionTitleText className="text-center !text-[#9395AA]">Best Offer</CollectionTitleText>
                         <SolanaItem value={item.floorPrice} style={{minWidth : '80px'}}/>
-                        <CollectionNameText className="text-center">Duration</CollectionNameText>
+                        <CollectionTitleText className="text-center !text-[#9395AA]">Duration</CollectionTitleText>
                         <Box className="flex justify-center items-center">
                             <InterestButton className="bg-[#1B1E3D] w-[32px] h-[32px] flex items-center justify-center mr-[5px] !text-[#5C84FF]">1</InterestButton>
                             <InterestButton className="bg-[#1B1E3D] w-[32px] h-[32px] flex items-center justify-center mr-[5px] !text-[#5C84FF]">7</InterestButton>
@@ -163,14 +164,14 @@ function BorrowItem({item}) {
             </Box>
             {(open && 
             <Box className="pt-[40px] pb-[30px] px-[10px] bg-[#1B1E3D] rounded-b-[12px] grid">
-                <CollectionNameText className="mr-[36px] pl-[25px] mb-[20px]">Choose NFT</CollectionNameText>
+                <CollectionNameText className="mr-[36px] pl-[10px] mb-[20px]">Choose NFT</CollectionNameText>
                 <Box className="flex flex-wrap  mb-[20px]">
-                    <Box className="w-[53px] h-[53px] bg-cover rounded-[6px] m-[5px]" style={{backgroundImage: `url(${item.img})`, border: "1px solid #5C84FF"}} />
-                    <Box className="w-[53px] h-[53px] bg-cover rounded-[6px] m-[5px]" style={{backgroundImage: `url(${item.img})`, border: "1px solid #5C84FF"}} />
-                    <Box className="w-[53px] h-[53px] bg-cover rounded-[6px] m-[5px]" style={{backgroundImage: `url(${item.img})`, border: "1px solid #5C84FF"}} />
-                    <Box className="w-[53px] h-[53px] bg-cover rounded-[6px] m-[5px]" style={{backgroundImage: `url(${item.img})`, border: "1px solid #5C84FF"}} />
-                    <Box className="w-[53px] h-[53px] bg-cover rounded-[6px] m-[5px]" style={{backgroundImage: `url(${item.img})`, border: "1px solid #5C84FF"}} />
-                    <Box className="w-[53px] h-[53px] bg-cover rounded-[6px] m-[5px]" style={{backgroundImage: `url(${item.img})`, border: "1px solid #5C84FF"}} />
+                    <Box className="w-[60px] h-[60px] bg-cover rounded-[6px] m-[5px]" style={{backgroundImage: `url(${item.img})`}} />
+                    <Box className="w-[60px] h-[60px] bg-cover rounded-[6px] m-[5px]" style={{backgroundImage: `url(${item.img})`}} />
+                    <Box className="w-[60px] h-[60px] bg-cover rounded-[6px] m-[5px]" style={{backgroundImage: `url(${item.img})`}} />
+                    <Box className="w-[60px] h-[60px] bg-cover rounded-[6px] m-[5px]" style={{backgroundImage: `url(${item.img})`}} />
+                    <Box className="w-[60px] h-[60px] bg-cover rounded-[6px] m-[5px]" style={{backgroundImage: `url(${item.img})`}} />
+                    <Box className="w-[60px] h-[60px] bg-cover rounded-[6px] m-[5px]" style={{backgroundImage: `url(${item.img})`}} />
                 </Box>
                 <Box className="flex flex-row justify-between cursor-pointer relative">
                     <CollectionNameText className="mr-[36px] pl-[10px]  mb-[20px]">Choose Offer</CollectionNameText>
@@ -193,7 +194,7 @@ function BorrowItem({item}) {
                 </Box>
                 <Box className="flex flex-wrap px-[13px] py-[13px] bg-[#111430] rounded-[12px] justify-between">
                         <Box className="flex">
-                            <img className="mr-[5px] my-auto !h-[60px] !w-[60px] rounded-[10px]" src="/images/mint/Token.png" alt="Cash" />
+                            <img className="mr-[5px] my-auto !h-[36px] !w-[36px] rounded-[10px]" src="/images/mint/Token.png" alt="Cash" />
                             <CollectionCashText className="my-auto cursor-pointer" style={{color : '#494D73'}}>
                                 <InfoNotify content={"Pool owner : user543556"}/>
                             </CollectionCashText>
@@ -213,7 +214,7 @@ function BorrowItem({item}) {
                     <SolanaItem value={item.floorPrice} style={{minWidth : '80px'}}/>
                 </Box>
                 <Box className="flex justify-center sm:justify-end mt-[30px]">
-                    <CollectionColorButton style={{fontFamily : 'Good Times'}}>BORROW</CollectionColorButton>
+                    <CollectionColorButton className="!font-GoodTime !w-fit">BORROW</CollectionColorButton>
                 </Box>
             </Box>
             )}
@@ -223,22 +224,27 @@ function BorrowItem({item}) {
 
 export default function Borrow() {
     const isDesktop = useMediaQuery('(min-width:1024px)');
-    
+    const { connection } = useConnection();
+    const wallet = useWallet();
+
     useEffect(() => {
         window.scrollTo(0, 0);
-    }, [])
+    }, []);
+
+    const showAllNft = async () => {
+    }
 
     return <Container>
-        <Box className="mt-[30px] mx-[20px] lg:mt-[120px] lg:mx-[120px] xl:mx-[240px] 2xl:mx-[360px]">
+        <Box className="mt-[30px] mx-[20px] lg:mt-[60px] lg:mx-[120px] xl:mx-[240px] 2xl:mx-[360px]">
             <Box className="flex flex-row">
                 <Box className="pt-[13px] sm:pt-[15px] 2xl:pt-[30px] " style={{width : '7px', height : 'auto', marginRight : '20px'}}>
-                    <Box className="w-[7px] bg-[#5C84FF] rounded-[8px] h-[60px] lg:h-[100px]"/>
+                    <Box className="w-[7px] bg-[#5C84FF] rounded-[8px] h-[40px] lg:h-[80px]"/>
                 </Box>
                 <Box className="flex flex-col">
-                    <LandingHeaderText className="mb-[10px]">
+                    <LandingHeaderText className="!font-GoodTime">
                         Borrow SOL
                     </LandingHeaderText>
-                    <LandingCaptionText className="mb-[40px] sm:mb-[100px]" style={{color : '#9395AA'}}>
+                    <LandingCaptionText className="mb-[40px] lg:mb-[60px] xl:mb-[80px] 2xl:mb-[100px]" style={{color : '#9395AA'}}>
                         Use your NFT's as collateral for short them SOL loans. <br/>
                         If you fail to repay your loan, you may lose ownership on the NFT <br/>
                         you borrow against.
@@ -247,13 +253,13 @@ export default function Borrow() {
             </Box>
             {
                 isDesktop &&
-                <Box className="hidden lg:grid px-[26px] gap-[5px] 2xl:gap-[10px]" gridTemplateColumns={'106px 106px 30fr 20fr 40fr 40fr 20fr'}>
-                    <CollectionItemText className="my-auto break-all text-center">Collection</CollectionItemText>
-                    <CollectionNameText className="my-auto break-all"></CollectionNameText>
-                    <CollectionItemText className="my-auto break-all text-center" style={{whiteSpace : 'nowrap'}}>Floor Price</CollectionItemText>
-                    <CollectionItemText className="my-auto break-all text-center" style={{whiteSpace : 'nowrap'}}>Best Offer</CollectionItemText>
-                    <CollectionItemText className="my-auto break-all text-center">Interest</CollectionItemText>
-                    <CollectionItemText className="my-auto break-all text-center">Duration</CollectionItemText>
+                <Box className="hidden lg:grid px-[26px] gap-[5px] 2xl:gap-[10px]" gridTemplateColumns={'80px 96px 30fr 20fr 40fr 40fr 20fr'}>
+                    <CollectionItemText className="my-auto text-center !text-[#9395AA]">Collection</CollectionItemText>
+                    <CollectionNameText className="my-auto break-all !text-[#9395AA]"></CollectionNameText>
+                    <CollectionItemText className="my-auto break-all text-center !text-[#9395AA]" style={{whiteSpace : 'nowrap'}}>Floor Price</CollectionItemText>
+                    <CollectionItemText className="my-auto break-all text-center !text-[#9395AA]" style={{whiteSpace : 'nowrap'}}>Best Offer</CollectionItemText>
+                    <CollectionItemText className="my-auto break-all text-center !text-[#9395AA]">Interest</CollectionItemText>
+                    <CollectionItemText className="my-auto break-all text-center !text-[#9395AA]">Duration</CollectionItemText>
                     <CollectionButton className="invisible">Lend</CollectionButton>
                 </Box>
             }

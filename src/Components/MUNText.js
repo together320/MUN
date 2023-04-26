@@ -5,14 +5,14 @@ import styled from "styled-components";
 
 export const InterestText = ({color, value}) => {
     return <div className="flex items-center justify-center py-[9px] px-[5px] font-normal text-[14px] border rounded-[6px] !h-[32px]" style={{borderColor : color, color : color, whiteSpace : 'nowrap'}}>
-        Interest : {value}%
+        {value}%
     </div>
 };
 
 export const SolanaItem = ({value, ...props}) => {
     return <Box className="flex justify-center" {...props}>
     <img className="my-auto h-[16px] w-[19px] mr-[5px] 2xl:mr-[7px]" src="/images/sol.png" alt="SolanaText" />
-    <SolanaText className="my-auto break-all">{value}&nbsp;</SolanaText>
+    <SolanaText className="my-auto break-all" style={{whiteSpace : 'nowrap'}}>{value}&nbsp;</SolanaText>
 </Box>
 }
 
@@ -69,21 +69,52 @@ export const MobileNavText = styled('div')`
 `
 
 export const LandingHeaderText = styled('div')`
-    font-family: 'Poppins';
+    font-family: 'GoodTime';
     font-style: normal;
     font-weight: 700;
-    font-size: 100px;
-    line-height: 120px;
+    font-size: 48px;
+    line-height: 80px;
     /* or 120% */
 
     @media (max-width: 1535px) {
-        font-size: 67px;
-        line-height: 80px;
+        font-size: 36px;
+        line-height: 60px;
+    }
+
+    @media (max-width: 1024px) {
+        font-size: 24px;
+        line-height: 40px;
     }
 
     @media (max-width: 768px) {
+        font-size: 18px;
+        line-height: 30px;
+    }
+
+    color: #FFFFFF;
+`
+
+export const HomeHeaderText = styled('div')`
+    font-family: 'GoodTime';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 80px;
+    line-height: 100px;
+    /* or 120% */
+
+    @media (max-width: 1535px) {
+        font-size: 60px;
+        line-height: 80px;
+    }
+
+    @media (max-width: 1024px) {
         font-size: 40px;
-        line-height: 55px;
+        line-height: 60px;
+    }
+
+    @media (max-width: 768px) {
+        font-size: 20px;
+        line-height: 40px;
     }
 
     color: #FFFFFF;
@@ -93,12 +124,12 @@ export const LandingCaptionText = styled('div')`
     font-family: 'Axiforma';
     font-style: normal;
     font-weight: 400;
-    font-size: 18px;
-    line-height: 29px;
+    font-size: 16px;
+    line-height: 25px;
 
     @media (max-width: 1535px) {
-        font-size: 14px;
-        line-height: 22px;
+        font-size: 12px;
+        line-height: 20px;
     }
 
     color: #FFFFFF;
@@ -118,6 +149,27 @@ export const OperateHeaderText = styled('div')`
     }
 
     color: #D9D9D9;
+`;
+
+export const MintHeaderText = styled('div')`
+    font-family: 'Poppins';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 28px;
+    line-height: 42px;
+    /* identical to box height, or 304% */
+
+    @media (max-width: 1535px) {
+        font-size: 21px;
+        line-height: 30px;
+    }
+
+    @media (max-width: 1024px) {
+        font-size: 14px;
+        line-height: 21px;
+    }
+
+    color: #FFFFFF;
 `;
 
 export const OperateCaptionText = styled('div')`
@@ -236,6 +288,7 @@ export const FooterCaption = styled('div')`
     font-weight: 400;
     font-size: 14px;
     line-height: 32px;
+    cursor : pointer;
     /* or 229% */
 
     @media (max-width: 1535px) {
@@ -298,7 +351,12 @@ export const MintPriceValue = styled('div')`
     /* identical to box height */
 
     @media (max-width: 1535px) {
-        font-size: 14px;
+        font-size: 18px;
+        line-height: 22px;
+    }
+
+    @media (max-width: 1024px) {
+        font-size: 16px;
         line-height: 22px;
     }
 
@@ -308,7 +366,21 @@ export const MintPriceValue = styled('div')`
 `;
 
 export const MintTotalValue = styled(ShareItemHeader)`
+    font-family: 'Poppins';
+    font-style: normal;
     font-weight: 400;
+    font-size: 28px;
+    line-height: 42px;
+    /* identical to box height */
+
+    @media (max-width: 1535px) {
+        font-size: 21px;
+        line-height: 30px;
+    }
+    @media (max-width: 1024px) {
+        font-size: 14px;
+        line-height: 20px;
+    }
 `;
 
 export const CollectionTitleText = styled('div')`

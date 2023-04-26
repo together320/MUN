@@ -45,27 +45,29 @@ export default function Header() {
     const [open, setOpen] = useState(false);
 
     if (isDesktop) {
-        return <Box className="px-[60px] py-[24px] flex items-center">
-            <img src="/logo.png" alt="Logo" />
+        return <Box className="px-[60px] pt-[24px] pb-[6px] xl:pb-[24px] flex items-center">
+            <img src="/logo.svg" className="cursor-pointer" alt="Logo" onClick={() => navigate("/home")}/>
             {
                 routes.map((item, i) => {
                     return <NavItem key={i} active={hash === `#${item.url}`} title={item.title} url={item.url} />
                 })
             }
             <span className="mr-auto" />
-            <img className="cursor-pointer my-auto mr-[10px]" src="/images/mint/muncat.png" alt="Mun cat" style={{width : '40px', height : '40px'}}/>
-            <ColorButton className="my-auto mr-[10px] h-[48px] flex flex-col justify-center" onClick={() => navigate("/mint")}>Get Our NFT</ColorButton>
-            <WalletMultiButton />
+            <Box className="flex flex-row mt-[-10px]">
+                <img className="cursor-pointer my-auto mr-[10px] h-[25px] lg:h-[30px] 2xl:h-[40px]" src="/images/mint/muncat.png" alt="Mun cat"/>
+                <ColorButton className="flex items-center cursor-pointer mr-[10px] h-[25px] lg:h-[30px] 2xl:h-[40px]" onClick={() => navigate("/mint")}>Get Our NFT</ColorButton>
+                <WalletMultiButton />
+            </Box>
         </Box>;
     }
     else {
         return <>
             <Box className="py-[12px] px-[24px] flex">
-                <img className="w-[64px]" src="/logo.png" alt="Logo" />
+                <img className="w-[64px]" src="/logo.png" alt="Logo" onClick={() => navigate("/home")}/>
                 <span className="mr-auto" />
                 <img className="my-auto h-fit cursor-pointer" src="/icons/menu.svg" alt="Menu" onClick={() => setOpen(!open)} />
             </Box>
-            {open && <Box className="bg-[#1B1E3D] absolute w-full top-[79px]">
+            {open && <Box className="bg-[#1B1E3D] absolute w-full top-[79px] z-[20]">
             {
                 routes.map((item, i) => {
                     return <MobileNavItem key={i} active={hash === `#${item.url}`} title={item.title} url={item.url} />
@@ -75,7 +77,7 @@ export default function Header() {
                 <WalletMultiButton />
             </Box>
             <Box className="h-[60px] flex justify-center">
-                <ColorButton className="items-center w-fit my-auto" onClick={() => navigate("/mint")}>Get Our NFT</ColorButton>
+                <ColorButton className="flex items-center w-fit my-auto !h-[35px]" onClick={() => navigate("/mint")}>Get Our NFT</ColorButton>
             </Box>
             </Box>}
         </>
