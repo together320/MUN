@@ -1,11 +1,17 @@
 
-import { useState } from "react";
+import { useState, useRef, useContext, useEffect } from "react";
+import { useWalletModal } from "@solana/wallet-adapter-react-ui";
+import axios from 'axios';
+import DialogContext from "../../Contexts/dialogContext";
 import { Box, useMediaQuery } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { NavTextActive, NavText, ColorButton, MobileNavText } from "../../Components";
-
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import "./WalletMultiButton.css";
+
+import { location } from '../../Api/config';
+import { getUserPFP } from "../../Api/fetch";
 
 function NavItem({active, title, url}) {
     const navigate = useNavigate();
@@ -35,14 +41,68 @@ const routes = [
     {title: "Dashboard", url: "/my-profile"},
     {title: "Lend", url: "/lend"},
     {title: "Borrow", url: "/borrow"},
+    {title: "Admin", url: "/admin"},
 ]
 
 export default function Header() {
     const isDesktop = useMediaQuery('(min-width:1024px)');
+    const diagCtx = useContext(DialogContext);
+
     const hash = window.location.hash;
     const navigate = useNavigate();
 
     const [open, setOpen] = useState(false);
+    const [pfpUri, setPfpUri] = useState(null);
+    const profileRef = useRef(null);
+    const wallet = useWallet();
+    const walletModal = useWalletModal();
+
+    useEffect(() => {
+        if(wallet?.connected && !wallet?.disconnecting && !wallet?.connecting){
+            getUserPFP(wallet.publicKey).then((res) => {
+                setPfpUri(res.pfp_uri);
+            });
+        }
+        if(!wallet?.connected && !wallet?.disconnecting && !wallet?.connecting){
+            setPfpUri(null);
+        }
+    }, [wallet])
+
+    const handleProfileClick = (e) => {
+        e.stopPropagation();
+        if (!wallet.connected) {
+            diagCtx.showWarning("You have to connect wallet to change PFP");
+            walletModal.setVisible(true);
+            return;
+        }
+        profileRef.current.value = null;
+        profileRef.current.click();
+    }
+
+    const handleUploadProfile = async (e) => {
+        if (e.target.files.length === 0) return;
+        const formData = new FormData();
+        formData.append("file", e.target.files[0]);
+        formData.append("fileName", e.target.files[0].name);
+        formData.append("wallet_addr", wallet.publicKey);
+//        formData.append("wallet_addr", wallet.publicKey);
+        try {
+          const res = await axios.post(
+            `${location}/uploadPFP`,
+            formData
+          );
+          setPfpUri(res.data.pfp_uri);
+          diagCtx.showSuccess("Successfully updated your PFP");
+        } catch (ex) {
+          diagCtx.showError("Invalid wallet address or bad connection");
+          console.log(ex);
+        }
+/*         _uploadProfile(id, e.target.files[0])
+        .then((res) => {
+            if (res.success === 1)
+                refreshProfile();
+        }) */
+    }
 
     if (isDesktop) {
         return <Box className="px-[60px] pt-[24px] pb-[6px] xl:pb-[24px] flex items-center">
@@ -54,7 +114,19 @@ export default function Header() {
             }
             <span className="mr-auto" />
             <Box className="flex flex-row mt-[-10px]">
-                <img className="cursor-pointer my-auto mr-[10px] h-[25px] lg:h-[30px] 2xl:h-[40px]" src="/images/mint/muncat.png" alt="Mun cat"/>
+                {
+                    pfpUri != null ?
+                <Box className="bg-cover cursor-pointer my-auto mr-[10px] w-[25px] h-[25px] lg:w-[30px] lg:h-[30px] 2xl:w-[40px] 2xl:h-[40px] rounded-full" style={{backgroundImage: `url(${pfpUri})`}}
+                onClick={handleProfileClick}/> : ""
+                }
+                <input
+                    type="file"
+                    name="file"
+                    accept="image/*"
+                    ref={profileRef}
+                    className="hidden"
+                    onChange={handleUploadProfile}
+                />
                 <ColorButton className="flex items-center cursor-pointer mr-[10px] h-[25px] lg:h-[30px] 2xl:h-[40px]" onClick={() => navigate("/mint")}>Get Our NFT</ColorButton>
                 <WalletMultiButton />
             </Box>

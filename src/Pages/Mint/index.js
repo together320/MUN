@@ -1,71 +1,118 @@
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import * as ipfsClient from "ipfs-http-client";
 import * as anchor from "@project-serum/anchor";
+import { useWalletModal } from "@solana/wallet-adapter-react-ui";
 import { Program } from "@project-serum/anchor";
+import { ASSOCIATED_PROGRAM_ID } from '@project-serum/anchor/dist/cjs/utils/token';
+import * as bs58 from "bs58";
+import {
+  Metaplex,
+  keypairIdentity,
+  bundlrStorage,
+  guestIdentity,
+  walletAdapterIdentity,
+  toBigNumber,
+  mockStorage,
+  toDateTime,
+  getSignerHistogram,
+  sol,
+  candyMachineModule
+} from "@metaplex-foundation/js";
+
+import {
+  fetchCandyMachine,
+  fetchCandyGuard,
+} from "@metaplex-foundation/mpl-candy-machine";
+
 import {
     TOKEN_PROGRAM_ID,
     createAssociatedTokenAccountInstruction,
     getAssociatedTokenAddress,
     createInitializeMintInstruction,
     MINT_SIZE,
+    AccountLayout,
 } from "@solana/spl-token";
 
-import MintMunNft from '../../Utility/Idl/mint_mun_nft.json';
-import { LAMPORTS_PER_SOL } from "@solana/web3.js";
+import MintMunNft from '../../Utility/Idl/idl.json';
+import { LAMPORTS_PER_SOL, PublicKey, Keypair, Connection, clusterApiUrl } from "@solana/web3.js";
 import { useAnchorWallet } from "@solana/wallet-adapter-react";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { Box } from "@mui/material";
 
 import { LandingCaptionText, MintHeaderText, SolanaItem, LandingHeaderText, MintPriceText, MintPriceValue, MintTotalValue, ShareItemHeader, MUNInput, AmountButton, ColorButton } from "../../Components";
 import Container from "../Container";
 import Teaser from '../../Assets/videos/Teaser.mp4';
 
+import DialogContext from "../../Contexts/dialogContext";
+import { Metadata, MetadataProgram } from '@metaplex-foundation/mpl-token-metadata';
+
+const MAX_NAME_LENGTH = 32;
+const MAX_URI_LENGTH = 200;
+const MAX_SYMBOL_LENGTH = 10;
+const MAX_CREATOR_LEN = 32 + 1 + 1;
+
 const TOKEN_METADATA_PROGRAM_ID = new anchor.web3.PublicKey(
     "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"
 );
 
 const MUN_PROGRAM_ID = new anchor.web3.PublicKey(
-    "9UqhCRhbAFtSd1MJhPWTHywQNQqik79qLKrJjesMKyYz"
+    "88hACzGK4gM7jLELx5HGge9wBUamCKxEyjtyLTSvysSX"
 );
 
+//candy machine id : 9i9e1h2H8cNm3qDkeAqjzkANDc4yDWmqSWVDPqg44swn
+//private key : 4FrHtgpbWMjwgpG61pQT3EsSdJDNso3gj1coWSkf94hTNcxF4yqFQUbYhXgqsqdTG2HpcbpRj41EHsY3sCrycbj2
 const NFT_SYMBOL = "mun-nft";
 
-const ipfs = ipfsClient.create({ host: 'ipfs.infura.io', port: 5001, protocol: 'https',apiPath: '/ipfs/api/v0' }) 
-
-let connection = new anchor.web3.Connection(anchor.web3.clusterApiUrl("devnet"), "confirmed");
+async function delay(delayMs) {
+  await new Promise((resolve) => setTimeout(resolve, delayMs));
+}
 
 export default function Mint() {
-    const [amount, setAmount] = useState("5");
-    const [balance, setBalance] = useState(0);
-    const [ImageFileBuffer, setImageFileBuffer] = useState(null);
+    const diagCtx = useContext(DialogContext);
+    const [amount, setAmount] = useState("1");
+    const [price, setPrice] = useState(0.5);
+    const [mintedCount, setMintedCount] = useState(0);
+    const [totalCount, setTotalCount] = useState(0);
     // const wallet = useAnchorWallet();
 
     useEffect(() => {
         if (amount === "")
             setAmount(0)
-        else
+        else{
             setAmount(parseInt(amount));
+            if(parseInt(amount) > 5)
+              setAmount(5);
+        }
     }, [amount])
     
     useEffect(() => {
         window.scrollTo(0, 0);
+        diagCtx.showLoading("Initializing...")
+        setTimeout(() => initialize(), 500);
     }, []);
 
-    const readFile = e => {
-      const file = e.target.files[0]
-      let reader = new FileReader();
-    
-      reader.onload = function(e) {
-        setImageFileBuffer(Buffer(reader.result));
-        console.log(reader.result);
-      }
-    
-      reader.readAsArrayBuffer(file);
+    const initialize = async () => {
+      const connection = new Connection(clusterApiUrl('devnet'));
+      const metaplex = new Metaplex(connection)
+      .use(walletAdapterIdentity(wallet))
+      .use(bundlrStorage());
+
+      const candyMachine = await metaplex
+        .candyMachines()
+        .findByAddress({ address: new PublicKey("7a9eMKQqRNnq4bVBurN6yYBEct9Di6Xt7beqmUKnXzTc") });
+ 
+
+        setMintedCount(candyMachine.itemsMinted.toString(10));
+        setTotalCount(candyMachine.itemsAvailable.toString(10));
+        setPrice(candyMachine.candyGuard.guards.solPayment.amount.basisPoints / LAMPORTS_PER_SOL);
+//        console.log(candyMachine.itemsMinted.toString(10), candyMachine.itemsAvailable.toString(10));
+        diagCtx.hideLoading();
     }
 
     const handlePlus = () => {
-        setAmount(parseInt(amount) + 1);
+      const intAmount = parseInt(amount);
+      setAmount(intAmount < 5 ? intAmount + 1 : 0);
     }
 
     const handleMinus = () => {
@@ -73,219 +120,424 @@ export default function Mint() {
         setAmount(intAmount > 0 ? intAmount - 1 : 0);
     }
 
-    const { connection } = useConnection();
+//    const { connection } = useConnection();
     const wallet = useWallet();
+    const walletModal = useWalletModal();
 
-    const onCreate = async (values) => {
-      console.log("Connection: ", connection);
-      console.log("Wallet: ", wallet);
-  
-      let {
-        name,
-        description,
-      } = values;
-  
-      let uploadedImageUrl = await uploadImageToIpfs();
-      console.log(uploadedImageUrl);
-      if (uploadImageToIpfs == null){
+    const fetchHashTable = async () => {
+      const connection = new Connection(clusterApiUrl('devnet'));
+      const metaplex = new Metaplex(connection)
+      .use(walletAdapterIdentity(wallet))
+      .use(bundlrStorage());
+      
+//      metaplex.nfts().findAllByUpdateAuthority
+    }
+
+    const updateNFT = async () => {
+      if (!wallet.connected) {
+        diagCtx.showError("You're not connected to wallet.");
+        walletModal.setVisible(true);
         return;
       }
-      console.log("Uploaded Image url: ", uploadedImageUrl);
-  
-      let uploadedMetatdataUrl = await uploadMetadataToIpfs(
-        name,
-        NFT_SYMBOL,
-        description,
-        uploadedImageUrl
-      );
-      if (uploadedMetatdataUrl == null) return;
-      console.log("Uploaded meta data url: ", uploadedMetatdataUrl);
-  
-      // setMinting(true);
-      const result = await mint(name, NFT_SYMBOL, uploadedMetatdataUrl);
-      // setMinting(false);
-      // setMintSuccess(result);
-    };
-  
-    const uploadImageToIpfs = async () => {
-      // setUploading(true);
-      console.log("uploading Image started");
-      let uploadedImage = await ipfs.add("asdf", (error, result) => {
-        console.log("IPFS result: ", result)
-        if(error){
-          console.log("error: ", error)
-          return
-        }
-      })
-      console.log("uploading Image finished");
-      // setUploading(false);
-  
-      if (!uploadedImage) {
-        // notification["error"]({
-        //   message: "Error",
-        //   description: "Something went wrong when updloading the file",
-        // });
-        console.log("upload Image failed");
-        return null;
-      }
-  
-      return `https://ipfs.infura.io/ipfs/${uploadedImage.path}`;
-    };
-  
-    const uploadMetadataToIpfs = async (
-      name,
-      symbol,
-      description,
-      uploadedImage,
-    ) => {
-      const metadata = {
-        name,
-        symbol,
-        description,
-        Image: uploadedImage,
-      };
-  
-      // setUploading(true);
-      const uploadedMetadata = await ipfs.add(JSON.stringify(metadata));
-      // setUploading(false);
-  
-      if (uploadedMetadata == null) {
-        console.log("upload metadata failed");
-        return null;
-      } else {
-        return `https://ipfs.infura.io/ipfs/${uploadedMetadata.path}`;
-      }
-    };
 
-    const mint = async (name, symbol, metadataUrl) => {
-      const accountInfo = await connection.getAccountInfo(MUN_PROGRAM_ID);
-      const accountPublicKey = accountInfo.owner.toBase58();
-      console.log("smart contract", accountPublicKey);
-      const provider = new anchor.AnchorProvider(connection, wallet);
-      anchor.setProvider(provider);
-  
-      const program = new Program(
-        MintMunNft,
-        MUN_PROGRAM_ID,
-        provider
-      );
-      console.log("Program Id: ", program.programId.toBase58());
-      console.log("Mint Size: ", MINT_SIZE);
-      const lamports =
-        await program.provider.connection.getMinimumBalanceForRentExemption(
-          MINT_SIZE
-        );
-      console.log("Mint Account Lamports: ", lamports);
-  
-      const getMetadata = async (mint) => {
-        return (
-          await anchor.web3.PublicKey.findProgramAddress(
-            [
-              Buffer.from("metadata"),
-              TOKEN_METADATA_PROGRAM_ID.toBuffer(),
-              mint.toBuffer(),
-            ],
-            TOKEN_METADATA_PROGRAM_ID
-          )
-        )[0];
-      };
-  
-      const mintKey = anchor.web3.Keypair.generate();
-  
-      const nftTokenAccount = await getAssociatedTokenAddress(
-        mintKey.publicKey,
-        provider.wallet.publicKey
-      );
-      console.log("NFT Account: ", nftTokenAccount.toBase58());
-  
-      const mint_tx = new anchor.web3.Transaction().add(
-        anchor.web3.SystemProgram.createAccount({
-          fromPubkey: provider.wallet.publicKey,
-          newAccountPubkey: mintKey.publicKey,
-          space: MINT_SIZE,
-          programId: TOKEN_PROGRAM_ID,
-          lamports,
-        }),
-        createInitializeMintInstruction(
-          mintKey.publicKey,
-          0,
-          provider.wallet.publicKey,
-          provider.wallet.publicKey
-        ),
-        createAssociatedTokenAccountInstruction(
-          provider.wallet.publicKey,
-          nftTokenAccount,
-          provider.wallet.publicKey,
-          mintKey.publicKey
-        )
-      );
-      let blockhashObj = await connection.getLatestBlockhash();
-      console.log("blockhashObj", blockhashObj);
-      mint_tx.recentBlockhash = blockhashObj.blockhash;
-  
-      try {
-        const signature = await wallet.sendTransaction(mint_tx, connection, {
-          signers: [mintKey],
-        });
-        await connection.confirmTransaction(signature, "confirmed");
-      } catch {
-        return false;
+      if(amount === 0 || amount === ""){
+          diagCtx.showError("Choose amount must be greater than 0.");
+          return;
       }
-  
-      console.log("Mint key: ", mintKey.publicKey.toString());
-      console.log("User: ", provider.wallet.publicKey.toString());
-  
-      const metadataAddress = await getMetadata(mintKey.publicKey);
-      console.log("Metadata address: ", metadataAddress.toBase58());
-  
+      diagCtx.showLoading(`Updating minted NFTs ...`);
+
+      const connection = new Connection(clusterApiUrl('devnet'));
+      const metaplex = new Metaplex(connection)
+      .use(walletAdapterIdentity(wallet))
+      .use(bundlrStorage());
+
+      let candyMachine;
       try {
-        const tx = program.transaction.mintNft(
-          mintKey.publicKey,
-          name,
-          symbol,
-          metadataUrl,
-          {
-            accounts: {
-              mintAuthority: provider.wallet.publicKey,
-              mint: mintKey.publicKey,
-              tokenAccount: nftTokenAccount,
-              tokenProgram: TOKEN_PROGRAM_ID,
-              metadata: metadataAddress,
-              tokenMetadataProgram: TOKEN_METADATA_PROGRAM_ID,
-              payer: provider.wallet.publicKey,
-              systemProgram: anchor.web3.SystemProgram.programId,
-              rent: anchor.web3.SYSVAR_RENT_PUBKEY,
-            },
+        candyMachine = await metaplex
+          .candyMachines()
+          .findByAddress({ address: new PublicKey("7a9eMKQqRNnq4bVBurN6yYBEct9Di6Xt7beqmUKnXzTc") });
+  
+          console.log(candyMachine.itemsMinted.toString(10), candyMachine.itemsAvailable.toString(10));
+      } catch(e){
+        diagCtx.showError(e.message);
+        diagCtx.hideLoading();
+        return;
+      }
+      
+      const txs = [];
+      const nameArray = ["MunBasic", "Icy", "SubZero", "FreeEnergy", "Golden", "BloodMun", "RoseGold", "White", "Pearl", "BlackOnyx", "BlackDiamond", "RoyalDiamond", "RoyalCrown"];
+
+      for (let i = 0; i < 15; i ++){
+        console.log(candyMachine.items[i]);
+      }
+      for (let i = 0; i < 15; i++ ) { // Add 3 NFTs (the size of our collection)
+        const items = [];
+        if(candyMachine.items[i].minted === true){
+          var a = candyMachine.items[i].uri.charAt(candyMachine.items[i].uri.length - 2);
+          var b = candyMachine.items[i].uri.charAt(candyMachine.items[i].uri.length - 1);
+          if(a >= '0' && a <= '9') a -= '0';
+          else  a = 0;
+          b -= '0';
+          var c = a * 10 + b;
+          console.log(candyMachine.items[i].uri, a, b, c);
+          items.push({
+              name: nameArray[c],
+              uri: `https://gateway.pinata.cloud/ipfs/QmNf9vheAtedTcpY9xnKa25eWaUfH7ajpuFsBjfieFdPkB/mun${c}`
+          })
+
+          
+          txs.push(
+            await metaplex.candyMachines().builders().insertItems({
+              candyMachine,
+              index : i,
+              items: items,
+              },{commitment:'finalized'})
+          );
+        }
+      }
+/*       const { response } = await metaplex.candyMachines().insertItems({
+          candyMachine,
+          items: items,
+        },{commitment:'finalized'}); */
+
+        const block = await metaplex.connection.getLatestBlockhash();
+          const txns = txs.map((builder) => {
+            const builderTx = builder.setFeePayer(metaplex.identity());
+    
+            const dropSigners = [metaplex.identity(), ...builderTx.getSigners()];
+            const { keypairs } = getSignerHistogram(dropSigners);
+            const tx = builderTx.toTransaction({
+              blockhash: block.blockhash,
+              lastValidBlockHeight: block.lastValidBlockHeight,
+            });
+    
+            if (keypairs.length > 0) {
+              tx.partialSign(...keypairs);
+            }
+            return tx;
+          });
+    
+          // make the connected wallet sign all transactions
+          const signedTx = await metaplex.identity().signAllTransactions(txns);
+    
+          // send the signed transactions in batches
+          const batchSize = 200; // sends 200 raw tx in parallel
+          const batches = [];
+          for (let i = 0; i < signedTx.length; i += batchSize) {
+            batches.push(signedTx.slice(i, i + batchSize));
           }
-        );
-  
-        const signature = await wallet.sendTransaction(tx, connection);
-        await connection.confirmTransaction(signature, "confirmed");
-        console.log("Mint Success!");
-        return true;
-      } catch {
-        return false;
-      }
-    }; 
+          let signatures = [];
+          for (const txs of batches) {
+            const signature = await Promise.all(
+              txs.map((tx) => metaplex.connection.sendRawTransaction(tx.serialize())),
+            );
+            signatures.push(signature);
+          }
+    
+          // wait for confirmations in parallel batches
+          let confirmations = [];
+          for (let i = 0; i < signatures.length; i += 1) {
+            await delay(1000); // add delay to avoid rate limiting
+            const sigs = signatures[i];
+            const confirmationBatch = await Promise.all(
+              sigs.map((sig) => {
+                return metaplex.rpc().confirmTransaction(sig, {
+                  blockhash: block.blockhash,
+                  lastValidBlockHeight: block.lastValidBlockHeight,
+                });
+              }),
+            );
+            confirmations.push(...confirmationBatch);
+          }
+    
+          if (confirmations.length === 0) {
+            throw new Error("Transaction failed");
+          }
+    
+          diagCtx.showSuccess("Update Success!");
+          diagCtx.hideLoading();
+          return signatures.flatMap((sig) => sig).map((signature) => ({ signature }));
+//      candyMachine.items[0].name; // "My NFT #1"
+       
+      /* const mintAddress = new PublicKey(
+        "BSNDYYrzhsGr6zgqsQxHKmiWGfkTzAeCNzYy19i4GqCf"
+      );
+    
+      const nft = await metaplex.nfts().findByMint({ mintAddress });
 
-    const mintButtonClicked = (name, symbol) => {
+      const txs = [];
+      await metaplex
+      .nfts()
+      .update({
+        nftOrSft: nft,
+        name: "My Updated Name111 "
+      });
+      
+      console.log("nft updated"); */
+    }
+    const createCandyMachine = async () => {
+      const connection = new Connection(clusterApiUrl('devnet'));
+      const metaplex = new Metaplex(connection)
+      .use(walletAdapterIdentity(wallet))
+      .use(bundlrStorage());
 
-        console.log("mint button clicked");
-        try {
-            // `publicKey` will be null if the wallet isn't connected
-            // if (!wallet.publicKey) throw new Error('Wallet not connected!');
-            // const SOL = connection.getAccountInfo(wallet.publicKey);
-            // SOL.then((res) => {
-                
-            //     setBalance(res.lamports / LAMPORTS_PER_SOL)
-            // });
-          } catch (error) {
-            console.log(`Signing failed: ${error?.message}`);
+      const { nft: collectionNft } = await metaplex.nfts().create({
+        name: "MUN-PASS",
+        symbol : "MUN-PASS",
+        uri: "https://gateway.pinata.cloud/ipfs/QmecHc52z16uQBEfEgz9btWV9Zpz4uhWVTiniHZfj3AKnp/teaser0",
+        sellerFeeBasisPoints: 0,
+        isCollection: true,
+        updateAuthority: wallet,
+      }, { commitment: "finalized" });
+
+      console.log(`✅ - Minted Collection NFT: ${collectionNft.address.toString()}`);
+      console.log(`     https://explorer.solana.com/address/${collectionNft.address.toString()}?cluster=devnet`);
+
+      const candyMachineSettings =
+        {
+            itemsAvailable: toBigNumber(15), // Collection Size: 3
+            sellerFeeBasisPoints: 1000, // 10% Royalties on Collection
+            symbol: "MUN-PASS",
+            maxEditionSupply: toBigNumber(0), // 0 reproductions of each NFT allowed
+            isMutable: true,
+            creators: [
+                { address: wallet.publicKey, share: 100 },
+            ],
+            collection: {
+                address: new PublicKey(collectionNft.address), // Can replace with your own NFT or upload a new one
+                updateAuthority: metaplex.identity(),
+            },
+            guards: {
+              botTax: { lamports: sol(0.001), lastInstruction: false },
+              solPayment: {
+                amount: sol(0.05),
+                destination: metaplex.identity().publicKey,
+              },
+              startDate: { date: toDateTime("2022-10-18T16:00:00Z") },
+              mintLimit: {
+                id: 1,
+                limit: 5,
+              },
+            },
+        };
+
+      const { candyMachine } = await metaplex.candyMachines().create(candyMachineSettings, { commitment: "finalized" });
+
+
+      console.log(`✅ - Created Candy Machine: ${candyMachine.address.toString()}`);
+      console.log(`     https://explorer.solana.com/address/${candyMachine.address.toString()}?cluster=devnet`);
+
+
+      const txs = [];
+      for (let i = 0; i < 3; i++ ) { // Add 3 NFTs (the size of our collection)
+        const items = [];
+        for(let j = 0; j < 5; j++){
+          items.push({
+              name: `Teaser`,
+              uri: `https://gateway.pinata.cloud/ipfs/QmecHc52z16uQBEfEgz9btWV9Zpz4uhWVTiniHZfj3AKnp/teaser${(i * 5 + j)%13}`
+          })
         }
+        txs.push(
+          await metaplex.candyMachines().builders().insertItems({
+            candyMachine,
+            index : i * 5,
+            items: items,
+            },{commitment:'finalized'})
+        );
+      }
+/*       const { response } = await metaplex.candyMachines().insertItems({
+          candyMachine,
+          items: items,
+        },{commitment:'finalized'}); */
+
+        const block = await metaplex.connection.getLatestBlockhash();
+          const txns = txs.map((builder) => {
+            const builderTx = builder.setFeePayer(metaplex.identity());
+    
+            const dropSigners = [metaplex.identity(), ...builderTx.getSigners()];
+            const { keypairs } = getSignerHistogram(dropSigners);
+            const tx = builderTx.toTransaction({
+              blockhash: block.blockhash,
+              lastValidBlockHeight: block.lastValidBlockHeight,
+            });
+    
+            if (keypairs.length > 0) {
+              tx.partialSign(...keypairs);
+            }
+            return tx;
+          });
+    
+          // make the connected wallet sign all transactions
+          const signedTx = await metaplex.identity().signAllTransactions(txns);
+    
+          // send the signed transactions in batches
+          const batchSize = 200; // sends 200 raw tx in parallel
+          const batches = [];
+          for (let i = 0; i < signedTx.length; i += batchSize) {
+            batches.push(signedTx.slice(i, i + batchSize));
+          }
+          let signatures = [];
+          for (const txs of batches) {
+            const signature = await Promise.all(
+              txs.map((tx) => metaplex.connection.sendRawTransaction(tx.serialize())),
+            );
+            signatures.push(signature);
+          }
+    
+          // wait for confirmations in parallel batches
+          let confirmations = [];
+          for (let i = 0; i < signatures.length; i += 1) {
+            await delay(1000); // add delay to avoid rate limiting
+            const sigs = signatures[i];
+            const confirmationBatch = await Promise.all(
+              sigs.map((sig) => {
+                return metaplex.rpc().confirmTransaction(sig, {
+                  blockhash: block.blockhash,
+                  lastValidBlockHeight: block.lastValidBlockHeight,
+                });
+              }),
+            );
+            confirmations.push(...confirmationBatch);
+          }
+    
+          if (confirmations.length === 0) {
+            throw new Error("Transaction failed");
+          }
+    
+          console.log(`✅ - Items added to Candy Machine: ${candyMachine.address.toString()}`);
+          return signatures.flatMap((sig) => sig).map((signature) => ({ signature }));
+    }
+  
+    const insertItemAndMint = async () => {
+      if (!wallet.connected) {
+        diagCtx.showError("You're not connected to wallet.");
+        walletModal.setVisible(true);
+        return;
+      }
+
+      if(amount === 0 || amount === ""){
+          diagCtx.showError("Choose amount must be greater than 0.");
+          return;
+      }
+      diagCtx.showLoading(`Minting ${amount} NFTs to your wallet...`);
+
+      const connection = new Connection(clusterApiUrl('devnet'));
+      const metaplex = new Metaplex(connection)
+      .use(walletAdapterIdentity(wallet))
+      .use(bundlrStorage());
+
+      let candyMachine;
+      try {
+        candyMachine = await metaplex
+          .candyMachines()
+          .findByAddress({ address: new PublicKey("7a9eMKQqRNnq4bVBurN6yYBEct9Di6Xt7beqmUKnXzTc") });
+  
+          console.log(candyMachine.itemsMinted.toString(10), candyMachine.itemsAvailable.toString(10));
+      } catch(e){
+        diagCtx.showError(e.message);
+        diagCtx.hideLoading();
+        return;
+      }
+
+      if (
+        candyMachine.itemsMinted.toString(10) >=
+          candyMachine.itemsAvailable.toString(10)
+      ) {
+        diagCtx.showError("Not enough items available");
+        diagCtx.hideLoading();
+        return;
+      }
+
+      // calculate the PDA where the amount of already minted 
+      const mitLimitCounter = metaplex.candyMachines().pdas().mintLimitCounter({
+        id: 1,                                // use value from your config
+        user: metaplex.identity().publicKey,
+        candyMachine: candyMachine.address,
+        candyGuard: candyMachine.candyGuard.address,
+      });
+      //Read Data from chain
+      const mintedAmountBuffer = await metaplex.connection.getAccountInfo(mitLimitCounter, "processed");
+      const mintedAmount = mintedAmountBuffer.data.readUintLE(0, 1);
+      if (mintedAmount >= 5) {
+        diagCtx.showError("mintLimit: mintLimit reached!");
+        diagCtx.hideLoading();
+        return;
+      }
+       
+        const txs = [];
+
+        for(var i = 0; i < amount; i++){
+          txs.push(
+            await metaplex.candyMachines().builders().mint({
+              candyMachine,
+              collectionUpdateAuthority: candyMachine.authorityAddress,
+              })
+          );
+        }
+
+          const block = await metaplex.connection.getLatestBlockhash();
+          const txns = txs.map((builder) => {
+            const builderTx = builder.setFeePayer(metaplex.identity());
+    
+            const dropSigners = [metaplex.identity(), ...builderTx.getSigners()];
+            const { keypairs } = getSignerHistogram(dropSigners);
+            const tx = builderTx.toTransaction({
+              blockhash: block.blockhash,
+              lastValidBlockHeight: block.lastValidBlockHeight,
+            });
+    
+            if (keypairs.length > 0) {
+              tx.partialSign(...keypairs);
+            }
+            return tx;
+          });
+    
+          // make the connected wallet sign all transactions
+          const signedTx = await metaplex.identity().signAllTransactions(txns);
+    
+          // send the signed transactions in batches
+          const batchSize = 200; // sends 200 raw tx in parallel
+          const batches = [];
+          for (let i = 0; i < signedTx.length; i += batchSize) {
+            batches.push(signedTx.slice(i, i + batchSize));
+          }
+          let signatures = [];
+          for (const txs of batches) {
+            const signature = await Promise.all(
+              txs.map((tx) => metaplex.connection.sendRawTransaction(tx.serialize())),
+            );
+            signatures.push(signature);
+          }
+    
+          // wait for confirmations in parallel batches
+          let confirmations = [];
+          for (let i = 0; i < signatures.length; i += 1) {
+            await delay(1000); // add delay to avoid rate limiting
+            const sigs = signatures[i];
+            const confirmationBatch = await Promise.all(
+              sigs.map((sig) => {
+                return metaplex.rpc().confirmTransaction(sig, {
+                  blockhash: block.blockhash,
+                  lastValidBlockHeight: block.lastValidBlockHeight,
+                });
+              }),
+            );
+            confirmations.push(...confirmationBatch);
+          }
+    
+          if (confirmations.length === 0) {
+            throw new Error("Transaction failed");
+          }
+    
+          signatures.flatMap((sig) => sig).map((signature) => ({ signature }));
+          diagCtx.showSuccess("Mint Success!");
+          diagCtx.hideLoading();
+
+          initialize();
     }
   
     return <Container>
-        <Box className="mt-[30px] mx-[20px] lg:mt-[60px] lg:mx-[120px] xl:mx-[240px] 2xl:mx-[360px]">
+        <Box className="mt-[30px] mx-[20px] lg:mt-[45px] 2xl:mt-[60px] lg:mx-[120px] xl:mx-[240px] 2xl:mx-[360px]">
             <Box className="flex flex-row">
                 <Box className="pt-[13px] sm:pt-[15px] 2xl:pt-[30px] " style={{width : '7px', height : 'auto', marginRight : '20px'}}>
                     <Box className="w-[7px] bg-[#5C84FF] rounded-[8px] h-[60px] lg:h-[100px]"/>
@@ -302,7 +554,7 @@ export default function Mint() {
             </Box>
             <Box className="bg-[#0B0E27] rounded-[12px] py-[10px] sm:py-[50px] text-center">
                 <MintHeaderText>
-                    17,448 / 22,222 Minted
+                    {mintedCount} / {totalCount} Minted
                 </MintHeaderText>
                 <Box className="mt-[15px] xl:mt-[30px] mx-[26px] rounded-[10px] lg:mx-[180px] h-[20px] xl:h-[40px] lg:rounded-[20px] bg-[#191E46]">
                      <Box className="rounded-[20px] w-[60%] h-full" sx={{background: "linear-gradient(0deg, #A8B5E0, #A8B5E0), linear-gradient(0deg, #A8B5E0, #A8B5E0), #A8B5E0;"}} />
@@ -318,7 +570,7 @@ export default function Mint() {
                 </Box>
                 <Box className="mt-[20px] xl:mt-[40px] mb-[16px] lg:mb-[24px] xl:mb-[32px] flex justify-center">
                     <MintPriceText className="my-auto mr-[14px]">Mint Price</MintPriceText>
-                    <SolanaItem value={1}/>
+                    <SolanaItem value={price}/>
                 </Box>
                 <Box className="mb-[16px] lg:mb-[24px] xl:mb-[32px] flex justify-center">
                     <MintPriceText className="my-auto mr-[32px]">Choose Amount</MintPriceText>
@@ -327,11 +579,20 @@ export default function Mint() {
                     <AmountButton className="ml-[11px] my-auto" onClick={handlePlus}>+</AmountButton>
                 </Box>
                 <MintTotalValue className="mb-[16px] lg:mb-[24px] xl:mb-[32px]">
-                    Total: <span className="text-[#38D39C]">{amount}</span> SOL
+                    Total: <span className="text-[#38D39C]">{(Math.round(amount * price * 100) / 100).toFixed(2)}</span> SOL
                 </MintTotalValue>
                 <Box className="flex justify-center">
-                    <ColorButton className="w-fit" onClick={() => /* onCreate({name : "Mun NFT", description : "This is mun nft"}) */ mint("MUN NFT", NFT_SYMBOL, "https://raw.githubusercontent.com/solana-developers/program-examples/new-examples/tokens/tokens/.assets/spl-token.json")}>
-                        Mint Now
+                    <ColorButton className="w-fit hidden" onClick={() => createCandyMachine()}>
+                        Create mun collection & candy machine & insert items
+                    </ColorButton>
+                    <ColorButton className="w-fit" onClick={() => insertItemAndMint()}>
+                        Mint Now{/* InsertItem and Mint(CandyMachine) */}
+                    </ColorButton>
+                    <ColorButton className="w-fit" onClick={() => updateNFT()}>
+                        Reveal Now{/* Update Teaser NFT(CandyMachine) */}
+                    </ColorButton>
+                    <ColorButton className="w-fit" onClick={() => fetchHashTable()}>
+                        Minted List Now{/* Update Teaser NFT(CandyMachine) */}
                     </ColorButton>
                 </Box>
             </Box>

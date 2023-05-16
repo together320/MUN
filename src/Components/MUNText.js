@@ -5,9 +5,16 @@ import styled from "styled-components";
 
 export const InterestText = ({color, value}) => {
     return <div className="flex items-center justify-center py-[9px] px-[5px] font-normal text-[14px] border rounded-[6px] !h-[32px]" style={{borderColor : color, color : color, whiteSpace : 'nowrap'}}>
+        Interest: {value}%
+    </div>
+};
+
+export const InterestMobileText = ({color, value}) => {
+    return <div className="flex items-center justify-center py-[9px] px-[5px] font-normal text-[14px] border rounded-[6px] !h-[32px]" style={{borderColor : color, color : color, whiteSpace : 'nowrap'}}>
         {value}%
     </div>
 };
+
 
 export const SolanaItem = ({value, ...props}) => {
     return <Box className="flex justify-center" {...props}>

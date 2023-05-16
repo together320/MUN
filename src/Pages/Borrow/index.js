@@ -1,4 +1,18 @@
 
+import { useWalletModal } from "@solana/wallet-adapter-react-ui";
+import { useConnection, useWallet } from "@solana/wallet-adapter-react";
+import * as anchor from "@project-serum/anchor";
+import { Program } from "@project-serum/anchor";
+import {
+    TOKEN_PROGRAM_ID,
+    NATIVE_MINT,
+} from "@solana/spl-token";
+
+
+import IDL from '../../Utility/Idl/idl.json';
+import { Metaplex, keypairIdentity, walletAdapterIdentity } from "@metaplex-foundation/js";
+import { Connection, clusterApiUrl, Keypair, PublicKey } from "@solana/web3.js";
+
 import { useState, useEffect } from "react";
 
 import { Box, useMediaQuery } from "@mui/material";
@@ -8,12 +22,11 @@ import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 
-import { CollectionNameText, SolanaItem, SolanaText, InterestButton, InterestText, CollectionItemText, LandingCaptionText, LandingHeaderText, ShareItemHeader, CollectionButton, CollectionColorButton, CollectionCashText, MintPriceValue, CollectionTitleText } from "../../Components";
+import { CollectionNameText, SolanaItem, SolanaText, InterestMobileText, InterestButton, InterestText, CollectionItemText, LandingCaptionText, LandingHeaderText, ShareItemHeader, CollectionButton, CollectionColorButton, CollectionCashText, MintPriceValue, CollectionTitleText } from "../../Components";
 import Container from "../Container";
 
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
-import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 
 const options = ['Highest Offer', 'Longest duration', 'Shortest duration', 'Lowest interest'];
 
@@ -32,7 +45,7 @@ const InfoNotify = ({content}) => {
     reposition={false} // prevents automatic readjustment of content position that keeps your popover content within its parent's bounds
     onClickOutside={() => setPopover(false)} // handle click events outside of the popover/target here!
     content={({ position, nudgedLeft, nudgedTop }) => ( // you can also provide a render function that injects some useful stuff!
-        <Box className="bg-[#24284A] py-[7px] px-[11px] text-[13px] text-[#BFC4F2] border border-[#51578C] rounded-[4px]">
+        <Box className="bg-[#24284A] py-[7px] px-[15px] text-[13px] text-[#BFC4F2] border border-[#51578C] rounded-[4px]">
             {content}
         </Box>
     )}
@@ -48,6 +61,28 @@ function BorrowItem({item}) {
     const [isDropdown, setDropDown] = useState(false);
 
     const classes = open ? "rounded-t-[12px]" : "rounded-[12px]";
+
+    const { connection } = useConnection();
+    const wallet = useWallet();
+
+    const startBorrow = async () => {
+        const keypair = Keypair.generate();
+        const metaplex = new Metaplex(connection);
+        metaplex.use(keypairIdentity(keypair));
+
+        /* const mintAddress = new PublicKey(
+            "Ay1U9DWphDgc7hq58Yj1yHabt91zTzvV2YJbAWkPNbaK"
+        );
+        
+        const nft = await metaplex.nfts().findByMint({ mintAddress });
+    
+        console.log("minted nft", nft.json); */
+
+        const owner = new PublicKey(wallet.publicKey);
+        const allNFTs = await metaplex.nfts().findAllByOwner({owner});
+        console.log(allNFTs);
+        return;
+    }
 
     if (isDesktop) {
         return <Box className="mb-[16px]">
@@ -124,7 +159,7 @@ function BorrowItem({item}) {
                 </Box>
                 <Box/>
                 <Box className="ml-auto mt-auto">
-                    <CollectionColorButton className="!font-GoodTime !w-fit">BORROW</CollectionColorButton>
+                    <CollectionColorButton className="!font-GoodTime !w-fit" onClick={() => startBorrow()}>BORROW</CollectionColorButton>
                 </Box>
             </Box>
             )}
@@ -200,7 +235,7 @@ function BorrowItem({item}) {
                             </CollectionCashText>
                         </Box>
                         <Box className="flex items-center justify-center">
-                            <InterestText color="#FFBE5C" value={2.6}/>
+                            <InterestMobileText color="#FFBE5C" value={2.6}/>
                             <CollectionCashText className="ml-[5px] my-auto cursor-pointer" style={{color : '#494D73'}}>
                                 <InfoNotify content={"Total Interest is 2.6% or 0.029 SOL"}/>
                             </CollectionCashText>
@@ -231,6 +266,44 @@ export default function Borrow() {
         window.scrollTo(0, 0);
     }, []);
 
+    const getCollectionOffers = async () => {
+        const metaplex = new Metaplex(connection);
+        metaplex.use(walletAdapterIdentity(wallet));
+
+        const owner = new PublicKey(metaplex.identity().publicKey);
+        const allNFTs = await metaplex.nfts().findAllByOwner({owner});
+        console.log(allNFTs);
+
+        const candyMachine = new PublicKey('7a9eMKQqRNnq4bVBurN6yYBEct9Di6Xt7beqmUKnXzTc');
+        const nfts = await metaplex
+        .candyMachinesV2()
+        .findMintedNfts({ candyMachine });
+
+    // const mintAddress = nfts.map(nft =>
+    //   nft.name + ': ' + nft.address.toString()
+    // );
+
+        const mintAddress = nfts.map(nft => {
+            if (nft.model == 'metadata') {
+            return nft.name + ': ' + nft.mintAddress.toString();
+            }
+        });
+
+        console.log('mintAddress =>', mintAddress);
+        console.log('nfts =>', nfts);
+    }
+
+    useEffect(() => {
+        if(wallet?.connected && !wallet?.disconnecting && !wallet?.connecting){
+            console.log("getting collection offers");
+            getCollectionOffers();
+        }
+        if(!wallet?.connected && !wallet?.disconnecting && !wallet?.connecting){
+            console.log("formatting collection offers");
+            getCollectionOffers([]);
+        }
+    }, [wallet])
+
     const showAllNft = async () => {
     }
 
@@ -245,9 +318,10 @@ export default function Borrow() {
                         Borrow SOL
                     </LandingHeaderText>
                     <LandingCaptionText className="mb-[40px] lg:mb-[60px] xl:mb-[80px] 2xl:mb-[100px]" style={{color : '#9395AA'}}>
-                        Use your NFT's as collateral for short them SOL loans. <br/>
-                        If you fail to repay your loan, you may lose ownership on the NFT <br/>
-                        you borrow against.
+                        Use your NFTs as collateral to instantly loan SOL. <br/>
+                        Your NFT will be locked in your wallet until the loans is repaid, If you fail to <br/>
+                        repay your loan on time, you may lose ownership of the NFT you<br/>
+                        borrowed against.
                     </LandingCaptionText>
                 </Box>
             </Box>

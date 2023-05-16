@@ -70,14 +70,14 @@ export default function Home() {
                 </Box>
             </SharedItem>
             <SharedItem title="Token" header="Lend / Borrow" caption="Use our platform to borrow Sol or lend against your MUN & BonkZ NFT."
-            bg="url(/images/home/ShaderItem2.svg)">
+            bg="url(/images/home/ShaderItem3.svg)">
                 <Box className="flex mt-auto mb-[8px]">
                     <ShareButton className="mr-[14px]">Lend</ShareButton>
                     <ShareButton>Borrow</ShareButton>
                 </Box>
             </SharedItem>
             <SharedItem title="Rewards" header="Automatic Pool" caption="We are the first to launch an automatic lending pool protocol, meaning you can just set up the pool and earn passive Solana."
-            bg="url(/images/home/ShaderItem3.svg)"/>
+            bg="url(/images/home/ShaderItem2.svg)"/>
             <SharedItem title="Staking" header="More Utility" caption="We are actively working on more professional tools that will be offered for free for our NFT holders."
             bg="url(/images/home/ShaderItem2.svg)"/>
         </>

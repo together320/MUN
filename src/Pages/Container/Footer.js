@@ -50,7 +50,7 @@ export default function Footer() {
                 </Box>
             </Box>
             <Box className="flex">
-                <FooterCaption className="ml-[38px] !cursor-default">© 2023 MUN, All rights reserved</FooterCaption>
+                <FooterCaption className="ml-[38px] !cursor-default">© 2021 O9D, All rights reserved</FooterCaption>
                 <FooterCaption className="ml-auto !cursor-default">Privacy Policy • Terms & Conditions</FooterCaption>
             </Box>
         </Box>;
