@@ -8,12 +8,14 @@ import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 
 export default function DialogProvider(props) {
-    const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+	const { enqueueSnackbar, closeSnackbar } = useSnackbar();
 	const [loading, setLoading] = useState(false);
 	const [loadingMessage, setLoadingMessage] = useState("");
+	const [collection, setCollection] = useState({});
+	const [isAdmin, setIsAdmin] = useState(false);
 
-    const action = snackbarId => (
-		<IconButton onClick={() => closeSnackbar(snackbarId)} sx={{color: 'inherit'}}>
+	const action = snackbarId => (
+		<IconButton onClick={() => closeSnackbar(snackbarId)} sx={{ color: 'inherit' }}>
 			<CloseIcon />
 		</IconButton>
 	);
@@ -23,7 +25,7 @@ export default function DialogProvider(props) {
 			variant: 'error',
 			action,
 			autoHideDuration: 4000,
-            anchorOrigin : {horizontal : 'right', vertical : 'bottom'}
+			anchorOrigin: { horizontal: 'right', vertical: 'bottom' }
 		});
 	}
 
@@ -32,7 +34,7 @@ export default function DialogProvider(props) {
 			variant: 'warning',
 			action,
 			autoHideDuration: 4000,
-            anchorOrigin : {horizontal : 'right', vertical : 'bottom'}
+			anchorOrigin: { horizontal: 'right', vertical: 'bottom' }
 		});
 	}
 
@@ -41,7 +43,7 @@ export default function DialogProvider(props) {
 			variant: 'success',
 			action,
 			autoHideDuration: 4000,
-            anchorOrigin : {horizontal : 'right', vertical : 'bottom'}
+			anchorOrigin: { horizontal: 'right', vertical: 'bottom' }
 		});
 	}
 
@@ -60,7 +62,11 @@ export default function DialogProvider(props) {
 		showSuccess,
 		showWarning,
 		showLoading,
-		hideLoading
+		hideLoading,
+		collection,
+		setCollection,
+		isAdmin,
+		setIsAdmin
 	};
 
 	return (

@@ -2,6 +2,7 @@
 import { useEffect } from "react";
 
 import { Box, useMediaQuery } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
 import { HomeHeaderText, LandingCaptionText, LandingHeaderText, OperateHeaderText, OperateCaptionText, ShareJoinText, ShareHeaderText, ShareCaptionText, BorderButton, ShareItemTitle, ShareItemHeader, ShareItemCaption, ShareButton } from "../../Components";
 import Container from "../Container";
@@ -36,6 +37,7 @@ function SharedItem(props) {
 
 export default function Home() {
     const isDesktop = useMediaQuery('(min-width:1024px)');
+    const navigate = useNavigate();
 
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -66,14 +68,14 @@ export default function Home() {
             <SharedItem title="Mint" header="Free Airdrop" caption="At least 70% of the collection will be air-dropped for FREE for various NFT communities on Solana."
             bg="url(/images/home/ShaderItem1.svg)">
                 <Box className="flex mt-auto mb-[8px]">
-                    <ShareButton style={{whiteSpace : 'nowrap'}}>Mint now (Soon)</ShareButton>
+                    <ShareButton style={{whiteSpace : 'nowrap'}} onClick={() => navigate('/mint')}>Mint now (Soon)</ShareButton>
                 </Box>
             </SharedItem>
             <SharedItem title="Token" header="Lend / Borrow" caption="Use our platform to borrow Sol or lend against your MUN & BonkZ NFT."
             bg="url(/images/home/ShaderItem3.svg)">
                 <Box className="flex mt-auto mb-[8px]">
-                    <ShareButton className="mr-[14px]">Lend</ShareButton>
-                    <ShareButton>Borrow</ShareButton>
+                    <ShareButton className="mr-[14px]" onClick={() => navigate('/lend')}>Lend</ShareButton>
+                    <ShareButton onClick={() => navigate('/borrow')}>Borrow</ShareButton>
                 </Box>
             </SharedItem>
             <SharedItem title="Rewards" header="Automatic Pool" caption="We are the first to launch an automatic lending pool protocol, meaning you can just set up the pool and earn passive Solana."

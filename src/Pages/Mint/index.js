@@ -20,18 +20,13 @@ import {
 } from "@metaplex-foundation/js";
 
 import {
-  fetchCandyMachine,
-  fetchCandyGuard,
-} from "@metaplex-foundation/mpl-candy-machine";
-
-import {
-    TOKEN_PROGRAM_ID,
-    createAssociatedTokenAccountInstruction,
-    getAssociatedTokenAddress,
-    createInitializeMintInstruction,
-    MINT_SIZE,
-    AccountLayout,
+  TOKEN_PROGRAM_ID,
+  NATIVE_MINT,
 } from "@solana/spl-token";
+
+import IDL from '../../Utility/Idl/idl.json';
+
+import { deriveSCAccountPDA, deriveConfigurationAccountPDA, derivePoolAccountPDA, deriveNFTAccountPDA, deriveOrderAccountPDA } from '../../Utility/ts/helper';
 
 import MintMunNft from '../../Utility/Idl/idl.json';
 import { LAMPORTS_PER_SOL, PublicKey, Keypair, Connection, clusterApiUrl } from "@solana/web3.js";
@@ -100,7 +95,7 @@ export default function Mint() {
 
       const candyMachine = await metaplex
         .candyMachines()
-        .findByAddress({ address: new PublicKey("7a9eMKQqRNnq4bVBurN6yYBEct9Di6Xt7beqmUKnXzTc") });
+        .findByAddress({ address: new PublicKey("87pqxjxmmktffuKyv9NA5k6XUmkmFbWavZDCwc7X3hmz") });
  
 
         setMintedCount(candyMachine.itemsMinted.toString(10));
@@ -125,11 +120,140 @@ export default function Mint() {
     const walletModal = useWalletModal();
 
     const fetchHashTable = async () => {
-      const connection = new Connection(clusterApiUrl('devnet'));
+      if (!wallet.connected) {
+        diagCtx.showError("You're not connected to wallet.");
+        walletModal.setVisible(true);
+        return;
+      }
+
+      const connection = new Connection(clusterApiUrl('devnet'), 'confirmed');
       const metaplex = new Metaplex(connection)
       .use(walletAdapterIdentity(wallet))
       .use(bundlrStorage());
+
+      const creator = new PublicKey(
+        "9Ys7aYTMaPeUJZSwpEhbSHoh9RqTcVdLvvEaD6tjSrB3"
+      );
       
+      diagCtx.showLoading(`Getting minted NFTs ...`);
+      const nfts = await metaplex.nfts().findAllByCreator({ creator });
+//      const nft = await metaplex.nfts().findByMint({mintAddress});
+      diagCtx.showLoading(`Updating minted NFTs ...`);
+//      console.log(nfts);
+      
+      const txs = [];
+      const nameArray = ["MunBasic", "Icy", "SubZero", "FreeEnergy", "Golden", "BloodMun", "RoseGold", "White", "Pearl", "BlackOnyx", "BlackDiamond", "RoyalDiamond", "RoyalCrown"];
+
+      /* txs.push(
+        await metaplex.nfts().builders().update({
+          name : "UpdatedName",
+          nftOrSft : nft,
+          },{commitment:'finalized'})
+      ); */
+      try{
+        for (let i = 0; i < nfts.length; i++ ) { // Add 3 NFTs (the size of our collection)
+          diagCtx.showLoading(`Updating minted NFTs ${(i+1)} / ${nfts.length}`);
+          if(nfts[i].uri.includes("mun") === true)
+            continue;
+          var a = nfts[i].uri.charAt(nfts[i].uri.length - 2);
+          var b = nfts[i].uri.charAt(nfts[i].uri.length - 1);
+          if(a >= '0' && a <= '9') a -= '0';
+          else  a = 0;
+          b -= '0';
+          var c = a * 10 + b;
+
+          console.log(nameArray[c], `https://gateway.pinata.cloud/ipfs/QmNf9vheAtedTcpY9xnKa25eWaUfH7ajpuFsBjfieFdPkB/mun${c}`);
+
+          const mintAddress = new PublicKey(
+            nfts[i].mintAddress
+          )
+          const nft = await metaplex.nfts().findByMint({mintAddress})
+          txs.push(
+            await metaplex.nfts().builders().update({
+              name : nameArray[c],
+              nftOrSft : nft,
+              uri : `https://gateway.pinata.cloud/ipfs/QmNf9vheAtedTcpY9xnKa25eWaUfH7ajpuFsBjfieFdPkB/mun${c}`
+              },{commitment:'finalized'})
+          );
+        }
+      } catch(e){
+        diagCtx.showError(e.message);
+        diagCtx.hideLoading();
+        return;
+      }
+/*       const { response } = await metaplex.candyMachines().insertItems({
+          candyMachine,
+          items: items,
+        },{commitment:'finalized'}); */
+
+      try{
+        const block = await metaplex.connection.getLatestBlockhash();
+        const txns = txs.map((builder) => {
+          const builderTx = builder.setFeePayer(metaplex.identity());
+  
+          const dropSigners = [metaplex.identity(), ...builderTx.getSigners()];
+          const { keypairs } = getSignerHistogram(dropSigners);
+          const tx = builderTx.toTransaction({
+            blockhash: block.blockhash,
+            lastValidBlockHeight: block.lastValidBlockHeight,
+          });
+  
+          if (keypairs.length > 0) {
+            tx.partialSign(...keypairs);
+          }
+          return tx;
+        });
+  
+        // make the connected wallet sign all transactions
+        const signedTx = await metaplex.identity().signAllTransactions(txns);
+  
+        // send the signed transactions in batches
+        const batchSize = 200; // sends 200 raw tx in parallel
+        const batches = [];
+        for (let i = 0; i < signedTx.length; i += batchSize) {
+          batches.push(signedTx.slice(i, i + batchSize));
+        }
+        let signatures = [];
+        for (const txs of batches) {
+          const signature = await Promise.all(
+            txs.map((tx) => metaplex.connection.sendRawTransaction(tx.serialize())),
+          );
+          signatures.push(signature);
+        }
+  
+        // wait for confirmations in parallel batches
+        let confirmations = [];
+        for (let i = 0; i < signatures.length; i += 1) {
+          await delay(1000); // add delay to avoid rate limiting
+          const sigs = signatures[i];
+          const confirmationBatch = await Promise.all(
+            sigs.map((sig) => {
+              return metaplex.rpc().confirmTransaction(sig, {
+                blockhash: block.blockhash,
+                lastValidBlockHeight: block.lastValidBlockHeight,
+              });
+            }),
+          );
+          confirmations.push(...confirmationBatch);
+        }
+  
+        if (confirmations.length === 0) {
+          diagCtx.showError("Transaction failed");
+          diagCtx.hideLoading();
+          throw new Error("Transaction failed");
+        }
+
+        signatures.flatMap((sig) => sig).map((signature) => ({ signature }));
+      } catch(e){
+        diagCtx.showError("Transaction Failed");
+        diagCtx.hideLoading();
+        return;
+      }
+  
+        diagCtx.showSuccess("Update Success!");
+        diagCtx.hideLoading();
+        
+
 //      metaplex.nfts().findAllByUpdateAuthority
     }
 
@@ -155,7 +279,7 @@ export default function Mint() {
       try {
         candyMachine = await metaplex
           .candyMachines()
-          .findByAddress({ address: new PublicKey("7a9eMKQqRNnq4bVBurN6yYBEct9Di6Xt7beqmUKnXzTc") });
+          .findByAddress({ address: new PublicKey("87pqxjxmmktffuKyv9NA5k6XUmkmFbWavZDCwc7X3hmz") });
   
           console.log(candyMachine.itemsMinted.toString(10), candyMachine.itemsAvailable.toString(10));
       } catch(e){
@@ -430,7 +554,7 @@ export default function Mint() {
       try {
         candyMachine = await metaplex
           .candyMachines()
-          .findByAddress({ address: new PublicKey("7a9eMKQqRNnq4bVBurN6yYBEct9Di6Xt7beqmUKnXzTc") });
+          .findByAddress({ address: new PublicKey("87pqxjxmmktffuKyv9NA5k6XUmkmFbWavZDCwc7X3hmz") });
   
           console.log(candyMachine.itemsMinted.toString(10), candyMachine.itemsAvailable.toString(10));
       } catch(e){
@@ -439,9 +563,45 @@ export default function Mint() {
         return;
       }
 
+      try {
+        const provider = new anchor.AnchorProvider(connection, wallet, {});
+        anchor.setProvider(provider);
+
+        const program = new Program(
+            IDL,
+            MUN_PROGRAM_ID,
+            provider
+        );
+        const [configurationPubKey] = await deriveConfigurationAccountPDA(
+            NATIVE_MINT,
+            program.programId
+        );
+
+        console.log(configurationPubKey.toBase58());
+
+        const configuration = await program.account.configuration.fetch(
+            configurationPubKey
+        );
+
+        if(configuration.mintOn.toNumber() === 0){
+          diagCtx.showWarning("Minting Off from Admin");
+          diagCtx.hideLoading();
+          return;
+        }
+        if(configuration.presaleAmount.toNumber() <= parseInt(candyMachine.itemsMinted.toString(10))){
+          diagCtx.showWarning("Presale Amount Reached. Please wait until Admin start new sale round.");
+          diagCtx.hideLoading();
+          return;
+        }
+      } catch(e){
+          diagCtx.showError(e.message);
+          diagCtx.hideLoading();
+          return;
+      }
+
       if (
-        candyMachine.itemsMinted.toString(10) >=
-          candyMachine.itemsAvailable.toString(10)
+        parseInt(candyMachine.itemsMinted.toString(10)) >=
+          parseInt(candyMachine.itemsAvailable.toString(10))
       ) {
         diagCtx.showError("Not enough items available");
         diagCtx.hideLoading();
@@ -458,11 +618,15 @@ export default function Mint() {
       //Read Data from chain
       const mintedAmountBuffer = await metaplex.connection.getAccountInfo(mitLimitCounter, "processed");
       const mintedAmount = mintedAmountBuffer.data.readUintLE(0, 1);
+      console.log("mintedAmount :", mintedAmount);
+
       if (mintedAmount >= 5) {
         diagCtx.showError("mintLimit: mintLimit reached!");
         diagCtx.hideLoading();
         return;
       }
+
+      try {
        
         const txs = [];
 
@@ -530,6 +694,11 @@ export default function Mint() {
           }
     
           signatures.flatMap((sig) => sig).map((signature) => ({ signature }));
+        } catch(e){
+          diagCtx.showError(e.message);
+          diagCtx.hideLoading();
+          return;
+        }
           diagCtx.showSuccess("Mint Success!");
           diagCtx.hideLoading();
 
@@ -588,12 +757,15 @@ export default function Mint() {
                     <ColorButton className="w-fit" onClick={() => insertItemAndMint()}>
                         Mint Now{/* InsertItem and Mint(CandyMachine) */}
                     </ColorButton>
-                    <ColorButton className="w-fit" onClick={() => updateNFT()}>
-                        Reveal Now{/* Update Teaser NFT(CandyMachine) */}
+                    <ColorButton className="w-fit hidden" onClick={() => updateNFT()}>
+                        Reveal Now
                     </ColorButton>
-                    <ColorButton className="w-fit" onClick={() => fetchHashTable()}>
-                        Minted List Now{/* Update Teaser NFT(CandyMachine) */}
-                    </ColorButton>
+                    {
+                      diagCtx.isAdmin &&
+                      <ColorButton className="w-fit" onClick={() => fetchHashTable()}>
+                          Update Now
+                      </ColorButton>
+                    }
                 </Box>
             </Box>
         </Box>

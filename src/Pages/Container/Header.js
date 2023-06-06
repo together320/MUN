@@ -13,6 +13,20 @@ import "./WalletMultiButton.css";
 import { location } from '../../Api/config';
 import { getUserPFP } from "../../Api/fetch";
 
+import * as anchor from "@project-serum/anchor";
+import { Program } from "@project-serum/anchor";
+
+import IDL from '../../Utility/Idl/idl.json';
+import {
+    TOKEN_PROGRAM_ID,
+    NATIVE_MINT,
+} from "@solana/spl-token";
+import { deriveSCAccountPDA, deriveConfigurationAccountPDA, derivePoolAccountPDA, deriveNFTAccountPDA, deriveOrderAccountPDA } from '../../Utility/ts/helper';
+
+const MUN_PROGRAM_ID = new anchor.web3.PublicKey(
+    "Cdk2qqpHx4YMtsqiCwwLJpnWQARc4kJQofY1hduvRiiX"
+);
+
 function NavItem({active, title, url}) {
     const navigate = useNavigate();
     const className = "ml-[40px] 2xl:ml-[60px] cursor-pointer";
@@ -36,7 +50,14 @@ function MobileNavItem({active, title, url}) {
         <MobileNavText className="cursor-pointer" onClick={() => navigate(url)}>{title}</MobileNavText>
 }
 
-const routes = [
+const routes_client = [
+    {title: "Home", url: "/home"},
+    {title: "Dashboard", url: "/my-profile"},
+    {title: "Lend", url: "/lend"},
+    {title: "Borrow", url: "/borrow"},
+]
+
+const routes_admin = [
     {title: "Home", url: "/home"},
     {title: "Dashboard", url: "/my-profile"},
     {title: "Lend", url: "/lend"},
@@ -56,15 +77,58 @@ export default function Header() {
     const profileRef = useRef(null);
     const wallet = useWallet();
     const walletModal = useWalletModal();
+    const { connection } = useConnection();
+
+    const initialize = async () => {        
+        const provider = new anchor.AnchorProvider(connection, wallet, {});
+        anchor.setProvider(provider);
+
+        const program = new Program(
+            IDL,
+            MUN_PROGRAM_ID,
+            provider
+        );
+
+        try {
+            const [configurationPubKey] = await deriveConfigurationAccountPDA(
+                NATIVE_MINT,
+                program.programId
+            );
+
+            console.log(configurationPubKey.toBase58());
+
+            const configuration = await program.account.configuration.fetch(
+                configurationPubKey
+            );
+
+            console.log(configuration.withdrawTaxVault.toBase58());
+            console.log(provider.wallet.publicKey.toBase58());
+
+
+            if(configuration.withdrawTaxVault.toBase58() === provider.wallet.publicKey.toBase58()){
+                diagCtx.setIsAdmin(true);
+            }
+        } catch(e){
+            diagCtx.showError(e.message);
+            diagCtx.hideLoading();
+            return;
+        }
+    }
 
     useEffect(() => {
-        if(wallet?.connected && !wallet?.disconnecting && !wallet?.connecting){
-            getUserPFP(wallet.publicKey).then((res) => {
-                setPfpUri(res.pfp_uri);
-            });
-        }
-        if(!wallet?.connected && !wallet?.disconnecting && !wallet?.connecting){
-            setPfpUri(null);
+        try {
+            if(wallet?.connected && !wallet?.disconnecting && !wallet?.connecting){
+                initialize();
+                /* getUserPFP(wallet.publicKey).then((res) => {
+                    setPfpUri(res.pfp_uri);
+                }); */
+            }
+            if(!wallet?.connected && !wallet?.disconnecting && !wallet?.connecting){
+                diagCtx.setIsAdmin(false);
+                setPfpUri(null);
+            }
+        } catch(e){
+            diagCtx.showError(e.message);
         }
     }, [wallet])
 
@@ -108,7 +172,9 @@ export default function Header() {
         return <Box className="px-[60px] pt-[24px] pb-[6px] xl:pb-[24px] flex items-center">
             <img src="/logo.svg" className="cursor-pointer" alt="Logo" onClick={() => navigate("/home")}/>
             {
-                routes.map((item, i) => {
+                diagCtx.isAdmin === true ? routes_admin.map((item, i) => {
+                    return <NavItem key={i} active={hash === `#${item.url}`} title={item.title} url={item.url} />
+                }) : routes_client.map((item, i) => {
                     return <NavItem key={i} active={hash === `#${item.url}`} title={item.title} url={item.url} />
                 })
             }
@@ -141,8 +207,10 @@ export default function Header() {
             </Box>
             {open && <Box className="bg-[#1B1E3D] absolute w-full top-[79px] z-[20]">
             {
-                routes.map((item, i) => {
-                    return <MobileNavItem key={i} active={hash === `#${item.url}`} title={item.title} url={item.url} />
+                diagCtx.isAdmin === true ? routes_admin.map((item, i) => {
+                    return <MobileNavItem key={i} active={hash === `#${item.url}`} title={"Log in to the panel"} url={item.url} />
+                }) : routes_client.map((item, i) => {
+                    return <MobileNavItem key={i} active={hash === `#${item.url}`} title={"Log in to the panel"} url={item.url} />
                 })
             }
             <Box className="h-[60px] flex justify-center">

@@ -5,6 +5,7 @@ import { Account } from "@solana/spl-token";
 
 const MUN_CONFIG_SEED = "mun_config";
 const MUN_SOL_VAULT_SEED = "mun_sol_vault";
+const MUN_TAX_VAULT_SEED = "mun_tax_vault";
 const MUN_NFT_VAULT_SEED = "mun_nft_vault";
 const MUN_POOL_SEED = "mun_pool";
 const MUN_ORDER_SEED = "mun_order";
@@ -115,6 +116,21 @@ export const deriveSCAccountPDA = async (
   );
 };
 
+export const deriveTaxAccountPDA = async (
+  scMint,
+  programId
+) => {
+  return await PublicKey.findProgramAddress(
+    [
+      scMint.toBuffer(),
+      Buffer.from(
+        utils.bytes.utf8.encode(MUN_TAX_VAULT_SEED)
+      ),
+    ],
+    programId
+  );
+};
+
 // configuration account pda
 export const deriveConfigurationAccountPDA = async (
   scMint,
@@ -132,14 +148,16 @@ export const deriveConfigurationAccountPDA = async (
 // NFT account pda
 export const deriveNFTAccountPDA = async (
   nftMint,
+  orderId,
   programId
 ) => {
   return await PublicKey.findProgramAddress(
     [
-      nftMint.toBuffer(),
       Buffer.from(
         utils.bytes.utf8.encode(MUN_NFT_VAULT_SEED)
       ),
+      Buffer.from(utils.bytes.utf8.encode(orderId.toString())),
+      nftMint.toBuffer(),
     ],
     programId
   );
@@ -171,9 +189,6 @@ export const deriveOrderAccountPDA = async (
   return await PublicKey.findProgramAddress(
     [
       Buffer.from(utils.bytes.utf8.encode(orderId.toString())),
-      Buffer.from(
-        utils.bytes.utf8.encode(MUN_ORDER_SEED)
-      ),
       configuration.toBuffer(),
     ],
     programId

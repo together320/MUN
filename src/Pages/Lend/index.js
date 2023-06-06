@@ -9,18 +9,18 @@ import {
 
 
 import IDL from '../../Utility/Idl/idl.json';
-import { LAMPORTS_PER_SOL} from "@solana/web3.js";
+import { LAMPORTS_PER_SOL, Keypair, PublicKey} from "@solana/web3.js";
 
 import { useState, useEffect, useContext } from "react";
-
+import { Metaplex, keypairIdentity, walletAdapterIdentity } from "@metaplex-foundation/js";
 import { Box, useMediaQuery, Checkbox } from "@mui/material";
 
 import { BorderToggleButton, MintPriceValue, MintPriceText, SolanaItem, MunF21W600, LandingCaptionText, LandingHeaderText, CollectionButton, CollectionColorButton, CollectionCashText, CollectionTitleText, SolanaText } from "../../Components";
 import { InterestButton } from "../../Components";
 import Container from "../Container";
 import { AmountInput } from "../../Components";
-import { GetCollectionList, getCollectionStats } from "../../Api/magicEden";
-import { deriveSCAccountPDA, deriveConfigurationAccountPDA, derivePoolAccountPDA } from '../../Utility/ts/helper';
+import { GetCollectionList, getCollectionStats, getNFTInfoByMintAddress } from "../../Api/magicEden";
+import { deriveSCAccountPDA, deriveConfigurationAccountPDA, derivePoolAccountPDA, deriveTaxAccountPDA } from '../../Utility/ts/helper';
 
 import DialogContext from "../../Contexts/dialogContext";
 
@@ -30,24 +30,19 @@ import Tooltip, { tooltipClasses } from '@mui/material/Tooltip';
 import MunCollection from '../../Assets/images/BlackDiamond.gif';
 
 const MUN_PROGRAM_ID = new anchor.web3.PublicKey(
-    "88hACzGK4gM7jLELx5HGge9wBUamCKxEyjtyLTSvysSX"
+    "Cdk2qqpHx4YMtsqiCwwLJpnWQARc4kJQofY1hduvRiiX"
 );
 
 const items = [
     {
-        "collectionSymbol": "mun_pass",
-        "name": "MUN PASS",
-        "image": MunCollection,
+        "collectionSymbol": "MUN-PASS",
+        "name": "MUN-PASS",
+        "image": "https://gateway.pinata.cloud/ipfs/QmVXcoTwhhLSME8LF3TXtkTyd2ezQDzDq9suRWy1ZUN431/Royal%20Crown.gif",
     },
     {
         "collectionSymbol": "mad_lads",
         "name": "Mad Lads",
         "image": "https://creator-hub-prod.s3.us-east-2.amazonaws.com/mad_lads_pfp_1682211343777.png",
-    },
-    {
-        "collectionSymbol": "chadswtf",
-        "name": "CHADS",
-        "image": "https://shdw-drive.genesysgo.net/DULc8DgYywybLKKosZXbT5HBYHZiUbkkwNYy7QbirUc2/chads.png",
     },
     {
         "collectionSymbol": "chadswtf",
@@ -73,7 +68,12 @@ function DesktopCollectionItem({item, chooseAll}){
     useEffect(() => {
         getCollectionStats(item.collectionSymbol).then((res) => {
             setCollectionDetail(res);
+        }).catch((error) => {
+            setCollectionDetail({symbol : 'unknown'});
+            console.log(error);
         });
+
+        window.scrollTo(0, 0);
     }, [])
 
     useEffect(() => {
@@ -228,6 +228,12 @@ export default function Lend() {
             NATIVE_MINT,
             program.programId
         );
+
+        const [munTaxVault] = await deriveTaxAccountPDA(
+            NATIVE_MINT,
+            program.programId
+        )
+
         const [configurationPubKey] = await deriveConfigurationAccountPDA(
             NATIVE_MINT,
             program.programId
@@ -243,6 +249,7 @@ export default function Lend() {
                 signer: provider.wallet.publicKey,
                 munSolMint: NATIVE_MINT,
                 munSolVault: munSolVault,
+                munTaxVault : munTaxVault,
                 configuration: configurationPubKey,
                 systemProgram: anchor.web3.SystemProgram.programId,
                 tokenProgram: TOKEN_PROGRAM_ID,
@@ -301,8 +308,6 @@ export default function Lend() {
 
     //here is used to create lending pool
     const startLending = async () => {
-        console.log(selectedCollection);
-        return;
         if (!wallet.connected) {
             diagCtx.showError("You're not connected to wallet.");
             walletModal.setVisible(true);
@@ -468,19 +473,42 @@ export default function Lend() {
             provider
         );
 
-        /* const keypair = Keypair.generate();
+        diagCtx.showLoading("Closing your pool ( getting your Tier level... )");
         const metaplex = new Metaplex(connection);
-        metaplex.use(keypairIdentity(keypair));
+        await wallet.connect();
+        metaplex.use(walletAdapterIdentity(wallet));
 
-        const owner = new PublicKey("Ea5YwRT8KJmouwKdPnnhfKiDWboF4AP376coFDwj5Mpp");
+        const owner = new PublicKey(wallet.publicKey);
         const allNFTs = await metaplex.nfts().findAllByOwner({owner});
-        console.log(allNFTs);
-        return; */
 
+        let tier_level = 1;
+        for(var j = 0; j < allNFTs.length; j++){
+            const mintAddress = new PublicKey(allNFTs[j].mintAddress);
+//\\            const nftJson = await metaplex.nfts().findByMint({ mintAddress });
+
+            const res = await getNFTInfoByMintAddress(allNFTs[j].mintAddress.toBase58());
+            for(var i = 0; i < res.attributes.length; i++){
+                console.log(i, res.attributes[i].trait_type, res.attributes[i].value);
+                if(res.attributes[i].trait_type === 'Level' && res.attributes[i].value > tier_level)
+                    tier_level = res.attributes[i].value;
+            }
+        }
+
+        console.log("Tier Level", tier_level);
+
+        console.log(allNFTs);
+
+        diagCtx.showLoading("Closing your pool ( getting necessary variables...)");
         const [munSolVault] = await deriveSCAccountPDA(
             NATIVE_MINT,
             program.programId
         );
+
+        const [munTaxVault] = await deriveTaxAccountPDA(
+            NATIVE_MINT,
+            program.programId
+        )
+
         const [configurationPubKey] = await deriveConfigurationAccountPDA(
             NATIVE_MINT,
             program.programId
@@ -496,16 +524,19 @@ export default function Lend() {
         );
 
         console.log(poolPubkey);
+        diagCtx.showLoading("Closing your pool ( sending transactions... )")
         try {
             await program.methods
             .cancelPool(
-                pool_id
+                pool_id,
+                new anchor.BN(tier_level)
             )
             .accounts({
                 signer: provider.wallet.publicKey,
                 configuration: configurationPubKey,
                 munSolMint: NATIVE_MINT,
                 munSolVault: munSolVault,
+                munTaxVault : munTaxVault,
                 userSolVault : provider.wallet.publicKey,
                 pool: poolPubkey,
                 systemProgram: anchor.web3.SystemProgram.programId,
@@ -685,6 +716,7 @@ export default function Lend() {
                 </Box>
             </Box>
             <Box className="flex justify-center sm:ml-auto sm:mt-auto">
+                <CollectionColorButton className="!font-GoodTime !w-fit hidden" onClick={() => initialize  ()}>Initialize</CollectionColorButton>
                 <CollectionColorButton className="!font-GoodTime !w-fit" onClick={() => startLending  ()}>START&nbsp;LENDING</CollectionColorButton>
             </Box>
         </Box>
@@ -720,7 +752,7 @@ export default function Lend() {
                 ownerPools.length !== 0 ? <>
             <MunF21W600 className="mb-[10px] sm:mb-[20px] md:px-[42px] px-[20px]">My Pools</MunF21W600>
             <LandingCaptionText className="mb-[20px] lg:mb-[30px] xl:mb-[45px] 2xl:mb-[60px] md:px-[42px] px-[20px]" style={{color : '#9395AA'}}>
-                View your p1ools and withdraw funds. <br/>
+                View your pools and withdraw funds. <br/>
                 Mun tools takes 1% service fee when the pool is closed and <br/>
                 Solana is withdrawn, no matter how long you used our service <br/>
             </LandingCaptionText>
@@ -743,11 +775,11 @@ export default function Lend() {
                         <Box className="grid grid-cols-3 gap-[5px]">
                             {
                             item.account.collections.map((item, key) => {
-                                return <img key={key} className="my-auto w-[53px]" src="/images/mint/Token.png" alt="SolanaText" />
+                                return <img key={key} className="my-auto w-[53px]" src="https://gateway.pinata.cloud/ipfs/QmVXcoTwhhLSME8LF3TXtkTyd2ezQDzDq9suRWy1ZUN431/Royal%20Crown.gif" alt="SolanaText" />
                             })
                             }
                         </Box>
-                        <SolanaItem value={item.account.earnedAmount.toNumber()} className="flex flex-row items-center justify-center"/>
+                        <SolanaItem value={Math.fround(item.account.earnedAmount / LAMPORTS_PER_SOL).toFixed(2)} className="flex flex-row items-center justify-center"/>
                         <Box className="flex justify-center">
                             <SolanaText className="my-auto break-all">&nbsp;{parseFloat(item.account.percentFloorPrice.toNumber().toFixed(1))}%</SolanaText>
                         </Box>
