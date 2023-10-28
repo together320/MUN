@@ -11,7 +11,7 @@ export default function Footer() {
         return <>
             <FooterCaption onClick={() => navigate('/home')}>Home</FooterCaption>
             <FooterCaption onClick={() => navigate('/lend')}>Lend</FooterCaption>
-            <FooterCaption onClick={() => navigate('/my-profile')}>Profile</FooterCaption>
+            <FooterCaption onClick={() => navigate('/my-profile')}>Dashboard</FooterCaption>
             <FooterCaption onClick={() => navigate('/borrow')}>Borrow</FooterCaption>
         </>
     }
@@ -50,14 +50,14 @@ export default function Footer() {
                 </Box>
             </Box>
             <Box className="flex">
-                <FooterCaption className="ml-[38px]">© 2021 O9D, All rights reserved</FooterCaption>
-                <FooterCaption className="ml-auto">Privacy Policy • Terms & Conditions</FooterCaption>
+                <FooterCaption className="ml-[38px] !cursor-default">© 2021 O9D, All rights reserved</FooterCaption>
+                <FooterCaption className="ml-auto !cursor-default">Privacy Policy • Terms & Conditions</FooterCaption>
             </Box>
         </Box>;
     }
     else {
         return <Box className="pb-[32px]">
-            <img className="w-[160px]" src="/logo.svg" alt="Logo" />
+            <object className="w-[160px] px-[32px]" data="/logo.svg" type="image/svg+xml" alt="Logo" />
             <Box className="px-[32px]">
                 <FooterTitle>Navigate</FooterTitle>
                 <Box className="mt-[24px] grid grid-cols-2">
@@ -67,7 +67,7 @@ export default function Footer() {
                 <Box className="mt-[24px]">
                     {renderSocial()}
                 </Box>
-                <FooterCaption className="mt-[32px]">© 2021 O9D, All rights reserved</FooterCaption>
+                <FooterCaption className="mt-[32px]">© 2023 MUN, All rights reserved</FooterCaption>
             </Box>
         </Box>
     }

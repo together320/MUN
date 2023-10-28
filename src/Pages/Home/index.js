@@ -2,18 +2,21 @@
 import { useEffect } from "react";
 
 import { Box, useMediaQuery } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
-import { LandingCaptionText, LandingHeaderText, OperateHeaderText, OperateCaptionText, ShareJoinText, ShareHeaderText, ShareCaptionText, BorderButton, ShareItemTitle, ShareItemHeader, ShareItemCaption, ShareButton } from "../../Components";
+import { HomeHeaderText, LandingCaptionText, LandingHeaderText, OperateHeaderText, OperateCaptionText, ShareJoinText, ShareHeaderText, ShareCaptionText, BorderButton, ShareItemTitle, ShareItemHeader, ShareItemCaption, ShareButton } from "../../Components";
 import Container from "../Container";
 
 function SharedItem(props) {
-    return <Box className="h-[270px] lg:w-[431px] lg:h-[340px] p-[32px] flex flex-col" sx={{
+    return <Box className="h-[270px] lg:w-[350px] lg:h-[340px] p-[32px] flex flex-col" sx={{
         border: "1px solid rgba(132, 106, 204, 0.5)",
         borderRadius: "12px",
-        backgroundImage: `url(/images/home/SharedBg.png)`,
+        backgroundImage: props.bg,
+        backgroundRepeat: "no-repeat",
+        backgroundPosition: "center center",
+        backgroundSize: "cover",
         transition: "background .5s, box-shadow .5s",
         "&:hover": {
-            backgroundImage: `url(/images/home/SharedBgActive.png)`,
             border: "2px solid #5C6AE1",
             boxShadow: "6px 6px 0px #5C6AE1",
             borderRadius: "8px",
@@ -34,6 +37,7 @@ function SharedItem(props) {
 
 export default function Home() {
     const isDesktop = useMediaQuery('(min-width:1024px)');
+    const navigate = useNavigate();
 
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -45,15 +49,15 @@ export default function Home() {
                 Join Us
             </ShareJoinText>
             <ShareHeaderText className="mb-[6px]">
-                Get your <br/>
-                MUN Shared
+                Get your<br/>
+                MUN Pass
             </ShareHeaderText>
             <ShareCaptionText className="mb-[27px]">
                 Will be used as a powerful utility for it’s holders, providing <br/>
                 lending option and more tools in the upcoming future, <br/>
                 exclusively for our NFT holders
             </ShareCaptionText>
-            <BorderButton className="w-fit">
+            <BorderButton className="w-fit !px-[20px] !py-[13px]">
                 Get it on MagicEden
             </BorderButton>
         </>
@@ -61,38 +65,41 @@ export default function Home() {
 
     const renderSharedItems = () => {
         return <>
-            <SharedItem title="Mint" header="Free Airdrop" caption="At least 70% of the collection will be air-dropped for FREE for various NFT communities on Solana.">
+            <SharedItem title="Mint" header="Free Airdrop" caption="At least 70% of the collection will be air-dropped for FREE for various NFT communities on Solana."
+            bg="url(/images/home/ShaderItem1.svg)">
                 <Box className="flex mt-auto mb-[8px]">
-                    <ShareButton>Mint now (Soon)</ShareButton>
+                    <ShareButton style={{whiteSpace : 'nowrap'}} onClick={() => navigate('/mint')}>Mint now (Soon)</ShareButton>
                 </Box>
             </SharedItem>
-            <SharedItem title="Token" header="Lend / Borrow" caption="Use our platform to borrow Sol or lend against your MUN & BonkZ NFT.">
+            <SharedItem title="Token" header="Lend / Borrow" caption="Use our platform to borrow Sol or lend against your MUN & other NFTs."
+            bg="url(/images/home/ShaderItem3.svg)">
                 <Box className="flex mt-auto mb-[8px]">
-                    <ShareButton className="mr-[14px]">Lend</ShareButton>
-                    <ShareButton>Borrow</ShareButton>
+                    <ShareButton className="mr-[14px]" onClick={() => navigate('/lend')}>Lend</ShareButton>
+                    <ShareButton onClick={() => navigate('/borrow')}>Borrow</ShareButton>
                 </Box>
             </SharedItem>
-            <SharedItem title="Rewards" header="$BONK friendly" caption="Our project will support $BONK by providing an option to lend against Bonkz NFT as well as a burning mechanism which will be deployed in the future." />
-            <SharedItem title="Staking" header="Utility" caption="We are actively working on more professional tools that will be offered for free for our NFT holders." />
+            <SharedItem title="Rewards" header="Automatic Pool" caption="We are the first to launch an automatic lending pool protocol, meaning you can just set up the pool and earn passive Solana."
+            bg="url(/images/home/ShaderItem2.svg)"/>
+            <SharedItem title="Staking" header="More Utility" caption="We are actively working on more professional tools that will be offered for free for our NFT holders."
+            bg="url(/images/home/ShaderItem2.svg)"/>
         </>
     }
 
     return <Container>
-        <Box className="grid grid-cols-1 px-[40px] gap-[12px] lg:grid-cols-2 lg:px-0 lg:gap-[60px]">
+        <Box className="grid grid-cols-1 px-[40px] gap-[12px] lg:grid-cols-2 lg:px-[172px]">
             <img className="ml-auto" src="/images/home/MUN.png" alt="MUN" />
             <Box className="flex flex-col justify-center">
-                <LandingHeaderText className="pb-[27px] text-center lg:text-left">
+                <HomeHeaderText className="pb-[27px] text-center lg:text-left">
                     Building The <br/>
-                    Future of NFT <br/>
-                    Finance
-                </LandingHeaderText>
-                <LandingCaptionText className="text-center lg:text-left">
-                    Mun finance was founded to <br/>
-                    be a pioneer in the NFT <br/>
-                    Sphere. Starting with NFT- <br/>
-                    backed loans and more <br/>
-                    financial services currently in <br/>
-                    the works.
+                    Future of <br/>
+                    <p className="text-transparent bg-clip-text bg-gradient-to-r from-[#B9C7F1] to-[#616799]">NFT Finance</p>
+                </HomeHeaderText>
+                <LandingCaptionText className="text-center lg:text-left !text-[#9395AA]">
+                    Bring you the first <br/>
+                    automatic lending pool on <br/>
+                    Solana, huge community <br/>
+                    airdrop and more advanced <br/>
+                    tools on the way <br/>
                 </LandingCaptionText>
             </Box>
         </Box>
@@ -106,17 +113,17 @@ export default function Home() {
                     <img className="my-auto max-w-[40%]" src="/images/home/SolanaText.png" alt="SolanaText" />
                 </Box>
                 <Box className="grid grid-cols-2 gap-[20px] lg:grid-cols-4 lg:gap-[140px] lg:mx-[20%]">
-                    <OperateCaptionText>Low Gas Fees</OperateCaptionText>
-                    <OperateCaptionText>Fast Transactions</OperateCaptionText>
+                    <OperateCaptionText>Low&nbsp;Gas&nbsp;Fees</OperateCaptionText>
+                    <OperateCaptionText>Fast&nbsp;Transactions</OperateCaptionText>
                     <OperateCaptionText>Scalable</OperateCaptionText>
                     <OperateCaptionText>Trusted</OperateCaptionText>
                 </Box>
             </Box>
         </Box>
-        <div className="mb-[67px] lg:mb-[216px]" />
+        <div className="mb-[67px] lg:mb-[100px]" />
         {
             isDesktop ?
-            <Box className="grid grid-cols-2 gap-[120px] 2xl:gap-[180px]">
+            <Box className="grid grid-cols-2 gap-[60px] 2xl:gap-[90px]">
                 <Box className="ml-auto flex flex-col justify-center">
                     {renderJoin()}
                 </Box>
@@ -124,7 +131,9 @@ export default function Home() {
             </Box>
             :
             <Box className="px-[26px]">
+                <Box className="flex justify-center">
                 <img className="mb-[26px]" src="/images/home/FreeMint.png" alt="MUN" />
+                </Box>
                 {renderJoin()}
             </Box>
         }
